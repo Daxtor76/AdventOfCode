@@ -29,7 +29,7 @@ namespace AoC
                 }
             }
 
-            Console.WriteLine($"The fatest elf has {GetTopXTotalCalories(OrderedElvesList(elves), 1)} calories.");
+            Console.WriteLine($"The fatest elf has {GetTopXTotalCalories(OrderedElvesList(elves), 3)} calories.");
         }
 
         public static int GetTopXTotalCalories(List<Elf> list, int top)
@@ -46,7 +46,7 @@ namespace AoC
 
         public static List<Elf> OrderedElvesList(List<Elf> list)
         {
-            List<Elf> result = new List<Elf>(list.OrderBy(elf => elf.calories));
+            List<Elf> result = new List<Elf>(list.OrderByDescending(elf => elf.calories));
             return result;
         }
     }
