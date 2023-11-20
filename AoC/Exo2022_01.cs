@@ -29,17 +29,25 @@ namespace AoC
                 }
             }
 
-            Console.WriteLine($"The fatest elf has {GetFatestElf(elves).calories} calogies.");
+            Console.WriteLine($"The fatest elf has {GetTopXTotalCalories(OrderedElvesList(elves), 1)} calories.");
         }
 
-        public static Elf GetFatestElf(List<Elf> list)
+        public static int GetTopXTotalCalories(List<Elf> list, int top)
         {
-            Elf tmp = new Elf(0);
-            foreach (Elf elf in list)
+            int totalCalories = 0;
+
+            for (int i = 0; i < top; i++)
             {
-                tmp = tmp.calories < elf.calories ? elf : tmp;
+                totalCalories += list[i].calories;
             }
-            return tmp;
+            
+            return totalCalories;
+        }
+
+        public static List<Elf> OrderedElvesList(List<Elf> list)
+        {
+            List<Elf> result = new List<Elf>(list.OrderBy(elf => elf.calories));
+            return result;
         }
     }
 
