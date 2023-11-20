@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace AoC
+namespace AoC2022_Exo1
 {
     public class Program
     {
@@ -58,6 +61,16 @@ namespace AoC
         public Elf(int pCalories) 
         {
             calories = pCalories;
+        }
+    }
+
+    [TestClass]
+    public class Test
+    {
+        [TestMethod]
+        public void PuzzleTest()
+        {
+            Assert.AreEqual(3, int.Parse("3"));
         }
     }
 }
