@@ -14,6 +14,9 @@ namespace AoC2022_Exo2
     1st column (opponent): A = Rock(1), B = Paper(2), C = Scissors(3)
     2nd column (me): X = Rock(1), Y = Paper(2), Z = Scissors(3)
     Match outcome: Lose(0), Draw(3), Victory(6)
+
+    12364 too low
+    15130 too high
     */
     public class Program
     {
@@ -49,7 +52,7 @@ namespace AoC2022_Exo2
             {
                 int roundScore = round.CalculateMyScore(choicesRules, outcomeRules);
                 tmpScore += roundScore;
-                Console.WriteLine($"+{roundScore}. New total: {tmpScore}");
+                Console.WriteLine($"New total: {tmpScore}");
             }
 
             return tmpScore;
@@ -88,19 +91,33 @@ namespace AoC2022_Exo2
                 && t.ToString().Length == 1),
                 "choiceB contains an unexpected character, too much characters or is empty");
 
+            
             if (choicesRules[opponentChoice] > choicesRules[myChoice])
             {
-                //Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win { outcomeRules["lose"] + choicesRules[myChoice] } points.");
-                return outcomeRules["lose"] + choicesRules[myChoice];
+                if (choicesRules[opponentChoice] == 3 && choicesRules[myChoice] == 1)
+                {
+                    Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
+                    return outcomeRules["victory"] + choicesRules[myChoice];
+                }
+                else
+                {
+                    Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win {outcomeRules["lose"] + choicesRules[myChoice]} points.");
+                    return outcomeRules["lose"] + choicesRules[myChoice];
+                }
             }
             else if (choicesRules[opponentChoice] == choicesRules[myChoice])
             {
-                //Console.WriteLine($"DRAW : {opponentChoice} vs {myChoice} -> you win {outcomeRules["draw"] + choicesRules[myChoice]} points.");
+                Console.WriteLine($"DRAW : {opponentChoice} vs {myChoice} -> you win {outcomeRules["draw"] + choicesRules[myChoice]} points.");
                 return outcomeRules["draw"] + choicesRules[myChoice];
             }
             else
             {
-                //Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
+                if (choicesRules[opponentChoice] == 1 && choicesRules[myChoice] == 3)
+                {
+                    Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win {outcomeRules["lose"] + choicesRules[myChoice]} points.");
+                    return outcomeRules["lose"] + choicesRules[myChoice];
+                }
+                Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
                 return outcomeRules["victory"] + choicesRules[myChoice];
             }
         }
@@ -129,11 +146,25 @@ namespace AoC2022_Exo2
             Assert.AreEqual(rounds[0].CalculateMyScore(Program.choicesRules, Program.outcomeRules), 8);
         }
         [TestMethod]
+        public void TestSpecificVictory()
+        {
+            // C X => I win with 7pts because rock beats scissors
+            rounds.Add(new Round("C", "X"));
+            Assert.AreEqual(rounds[0].CalculateMyScore(Program.choicesRules, Program.outcomeRules), 7);
+        }
+        [TestMethod]
         public void TestLose()
         {
             // B X => I lose with 1pt
             rounds.Add(new Round("B", "X"));
             Assert.AreEqual(rounds[0].CalculateMyScore(Program.choicesRules, Program.outcomeRules), 1);
+        }
+        [TestMethod]
+        public void TestSpecificLose()
+        {
+            // A Z => I lose with 3pts because rock beats scissors
+            rounds.Add(new Round("A", "Z"));
+            Assert.AreEqual(rounds[0].CalculateMyScore(Program.choicesRules, Program.outcomeRules), 3);
         }
         [TestMethod]
         public void TestDraw()
