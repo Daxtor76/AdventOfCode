@@ -16,26 +16,28 @@ namespace AoC2022_Exo2
     */
     public class Program
     {
+        public static Dictionary<string, int> choicesRules = new Dictionary<string, int>
+        {
+            { "A", 1 },
+            { "B", 2 },
+            { "C", 3 },
+            { "X", 1 },
+            { "Y", 2 },
+            { "Z", 3 }
+        };
+        public static Dictionary<string, int> outcomeRules = new Dictionary<string, int>
+        {
+            { "lose", 0 },
+            { "draw", 3 },
+            { "victory", 6 },
+        };
         public static void Main()
         {
             string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2022_02.txt");
             string[] textSplitted = text.Split(Environment.NewLine);
-            Dictionary<string, int> choicesRules = new Dictionary<string, int>
-            {
-                { "A", 1 },
-                { "B", 2 },
-                { "C", 3 },
-                { "X", 1 },
-                { "Y", 2 },
-                { "Z", 3 }
-            };
-            Dictionary<string, int> outcomeRules = new Dictionary<string, int>
-            {
-                { "lose", 0 },
-                { "draw", 3 },
-                { "victory", 6 },
-            };
+
             List<Round> rounds = InitRounds(textSplitted);
+
             int myFinalScore = CalculateFinalScore(choicesRules, outcomeRules, rounds);
         }
 
@@ -44,7 +46,7 @@ namespace AoC2022_Exo2
             int tmpScore = 0;
             foreach (Round round in rounds)
             {
-                tmpScore += round.CalculateMyScore(round.opponentChoice, round.myChoice, choicesRules, outcomeRules);
+                tmpScore += round.CalculateMyScore(choicesRules, outcomeRules);
             }
             Console.WriteLine(tmpScore);
 
@@ -72,43 +74,46 @@ namespace AoC2022_Exo2
             myChoice = p_myChoice;
         }
 
-        public int CalculateMyScore(string choiceA, string choiceB, Dictionary<string, int> choicesRules, Dictionary<string, int> outcomeRules)
+        public int CalculateMyScore(Dictionary<string, int> choicesRules, Dictionary<string, int> outcomeRules)
         {
             //Assert.IsTrue(Regex.IsMatch(choiceA, @"^[A-C]+$"), $"choiceA contains an unexpected character");
             Assert.IsTrue(
-                choiceA.All(t => (t.ToString().Contains("A") || t.ToString().Contains("B") || t.ToString().Contains("C"))
+                opponentChoice.All(t => (t.ToString().Contains("A") || t.ToString().Contains("B") || t.ToString().Contains("C"))
                 && t.ToString().Length == 1),
                 "choiceA contains an unexpected character, too much characters or is empty");
             Assert.IsTrue(
-                choiceB.All(t => (t.ToString().Contains("X") || t.ToString().Contains("Y") || t.ToString().Contains("Z"))
+                myChoice.All(t => (t.ToString().Contains("X") || t.ToString().Contains("Y") || t.ToString().Contains("Z"))
                 && t.ToString().Length == 1),
                 "choiceB contains an unexpected character, too much characters or is empty");
 
-            if (choicesRules[choiceA] > choicesRules[choiceB])
+            if (choicesRules[opponentChoice] > choicesRules[myChoice])
             {
-                Console.WriteLine($"LOSE : { choiceA } vs { choiceB } -> you win { outcomeRules["lose"] + choicesRules[choiceB] } points.");
-                return outcomeRules["lose"] + choicesRules[choiceB];
+                Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win { outcomeRules["lose"] + choicesRules[myChoice] } points.");
+                return outcomeRules["lose"] + choicesRules[myChoice];
             }
-            else if (choicesRules[choiceA] == choicesRules[choiceB])
+            else if (choicesRules[opponentChoice] == choicesRules[myChoice])
             {
-                Console.WriteLine($"DRAW : {choiceA} vs {choiceB} -> you win {outcomeRules["draw"] + choicesRules[choiceB]} points.");
-                return outcomeRules["draw"] + choicesRules[choiceB];
+                Console.WriteLine($"DRAW : {opponentChoice} vs {myChoice} -> you win {outcomeRules["draw"] + choicesRules[myChoice]} points.");
+                return outcomeRules["draw"] + choicesRules[myChoice];
             }
             else
             {
-                Console.WriteLine($"VICTORY : {choiceA} vs {choiceB} -> you win {outcomeRules["victory"] + choicesRules[choiceB]} points.");
-                return outcomeRules["victory"] + choicesRules[choiceB];
+                Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
+                return outcomeRules["victory"] + choicesRules[myChoice];
             }
         }
     }
 
     [TestClass]
-    public class Test
+    public class Tests
     {
+        public List<Round> rounds = new List<Round>();
         [TestMethod]
-        public void PuzzleTest()
+        public void TestVictory()
         {
-            Assert.AreEqual(3, int.Parse("3"));
+            // A Y => I win with 8
+            rounds.Add(new Round("A", "Y"));
+            Assert.AreEqual(rounds[0].CalculateMyScore(Program.choicesRules, Program.outcomeRules), 8);
         }
     }
 }
