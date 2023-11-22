@@ -12,7 +12,8 @@ namespace AoC2022_Exo2
 {
     /*
     1st column (opponent): A = Rock(1), B = Paper(2), C = Scissors(3)
-    2nd column (me): X = Rock(1), Y = Paper(2), Z = Scissors(3)
+    STEP 01: 2nd column (me): X = Rock(1), Y = Paper(2), Z = Scissors(3)
+    STEP 02: 2nd column: X = Lose, Y = Draw, Z = Win
     Match outcome: Lose(0), Draw(3), Victory(6)
 
     12364 too low
@@ -29,20 +30,26 @@ namespace AoC2022_Exo2
             { "Y", 2 },
             { "Z", 3 }
         };
+        public enum MyChoicesRules
+        {
+            X = 1,
+            Y = 2,
+            Z = 3
+        }
         public static Dictionary<string, int> outcomeRules = new Dictionary<string, int>
         {
-            { "lose", 0 },
-            { "draw", 3 },
-            { "victory", 6 }
+            { "X", 0 },
+            { "Y", 3 },
+            { "Z", 6 }
         };
         public static void Main()
         {
             string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2022_02.txt");
             string[] textSplitted = text.Split(Environment.NewLine);
 
-            List<Round> rounds = InitRounds(textSplitted);
+            List<Round> rounds = InitRounds(textSplitted, "02");
 
-            int myFinalScore = CalculateFinalScore(choicesRules, outcomeRules, rounds);
+            int myStep01FinalScore = CalculateFinalScore(choicesRules, outcomeRules, rounds);
         }
 
         public static int CalculateFinalScore(Dictionary<string, int> choicesRules, Dictionary<string, int> outcomeRules, List<Round> rounds)
@@ -52,18 +59,22 @@ namespace AoC2022_Exo2
             {
                 int roundScore = round.CalculateMyScore(choicesRules, outcomeRules);
                 tmpScore += roundScore;
-                Console.WriteLine($"New total: {tmpScore}");
+                //Console.WriteLine($"New total: {tmpScore}");
             }
+            Console.WriteLine($"Total: {tmpScore}");
 
             return tmpScore;
         }
 
-        public static List<Round> InitRounds(string[] data)
+        public static List<Round> InitRounds(string[] data, string step)
         {
             List<Round> tmpRounds = new List<Round>();
             for (int i = 0; i < data.Length; i++)
             {
-                tmpRounds.Add(new Round(data[i].Substring(0, 1), data[i].Substring(data[i].Length - 1, 1)));
+                if (step == "01")
+                    tmpRounds.Add(new Round(data[i].Substring(0, 1), data[i].Substring(data[i].Length - 1, 1)));
+                else
+                    tmpRounds.Add(new Round(data[i].Substring(0, 1), data[i].Substring(data[i].Length - 1, 1), ""));
             }
             return tmpRounds;
         }
@@ -73,14 +84,73 @@ namespace AoC2022_Exo2
     {
         public string opponentChoice;
         public string myChoice;
+        public string outcome;
         public Round(string p_opponentChoice, string p_myChoice) 
         { 
             opponentChoice = p_opponentChoice;
             myChoice = p_myChoice;
+            outcome = "";
+        }
+        public Round(string p_opponentChoice, string p_outcome, string p_myChoice)
+        {
+            opponentChoice = p_opponentChoice;
+            outcome = p_outcome;
+            myChoice = CalculateMyChoice();
+        }
+
+        public string CalculateMyChoice()
+        {
+            /*
+             * si on doit draw, je choisi la même chose que lui
+             * si je dois perdre, je choisis la valeur de son item -1 ou la 3 si l'autre n'existe pas
+             * si je dois gagner, je choisis la valeur de son item +1 ou la 1 si l'autre n'existe pas
+             * 
+             * Ex outcome : X => 3 => Draw
+             */
+            if (outcome == "X")
+            {
+                // défaite
+                if (Program.choicesRules[opponentChoice] - 1 < 1)
+                {
+                    Console.WriteLine($"Mon adversaire a choisi {opponentChoice}, et comme je dois {outcome} je vais prendre {((Program.MyChoicesRules)3)}");
+                    return ((Program.MyChoicesRules)3).ToString();
+                }
+                else
+                {
+                    Console.WriteLine($"Mon adversaire a choisi {opponentChoice}, et comme je dois {outcome} je vais prendre {((Program.MyChoicesRules)Program.choicesRules[opponentChoice] - 1).ToString()}");
+                    return ((Program.MyChoicesRules)Program.choicesRules[opponentChoice]-1).ToString();
+                }
+            }
+            else if (outcome == "Y")
+            {
+                Console.WriteLine($"Mon adversaire a choisi {opponentChoice}, et comme je dois {outcome} je vais prendre {((Program.MyChoicesRules)Program.choicesRules[opponentChoice]).ToString()}");
+                return ((Program.MyChoicesRules)Program.choicesRules[opponentChoice]).ToString();
+            }
+            else
+            {
+                // Victoire
+                if (Program.choicesRules[opponentChoice] + 1 > 3)
+                {
+                    Console.WriteLine($"Mon adversaire a choisi {opponentChoice}, et comme je dois {outcome} je vais prendre {((Program.MyChoicesRules)1)}");
+                    return ((Program.MyChoicesRules)1).ToString();
+                }
+                else
+                {
+                    Console.WriteLine($"Mon adversaire a choisi {opponentChoice}, et comme je dois {outcome} je vais prendre {((Program.MyChoicesRules)Program.choicesRules[opponentChoice] + 1).ToString()}");
+                    return ((Program.MyChoicesRules)Program.choicesRules[opponentChoice]+1).ToString();
+                }
+            }
+        }
+
+        public string GetChoiceStringByValue(int value)
+        {
+            return ((Program.MyChoicesRules)value).ToString();
         }
 
         public int CalculateMyScore(Dictionary<string, int> choicesRules, Dictionary<string, int> outcomeRules)
         {
+            // This function allows to calculate my score in this round
+
             //Assert.IsTrue(Regex.IsMatch(choiceA, @"^[A-C]+$"), $"choiceA contains an unexpected character");
             Assert.IsTrue(
                 opponentChoice.All(t => (t.ToString().Contains("A") || t.ToString().Contains("B") || t.ToString().Contains("C"))
@@ -96,29 +166,29 @@ namespace AoC2022_Exo2
             {
                 if (choicesRules[opponentChoice] == 3 && choicesRules[myChoice] == 1)
                 {
-                    Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
-                    return outcomeRules["victory"] + choicesRules[myChoice];
+                    //Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
+                    return outcomeRules["Z"] + choicesRules[myChoice];
                 }
                 else
                 {
-                    Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win {outcomeRules["lose"] + choicesRules[myChoice]} points.");
-                    return outcomeRules["lose"] + choicesRules[myChoice];
+                    //Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win {outcomeRules["lose"] + choicesRules[myChoice]} points.");
+                    return outcomeRules["X"] + choicesRules[myChoice];
                 }
             }
             else if (choicesRules[opponentChoice] == choicesRules[myChoice])
             {
-                Console.WriteLine($"DRAW : {opponentChoice} vs {myChoice} -> you win {outcomeRules["draw"] + choicesRules[myChoice]} points.");
-                return outcomeRules["draw"] + choicesRules[myChoice];
+                //Console.WriteLine($"DRAW : {opponentChoice} vs {myChoice} -> you win {outcomeRules["draw"] + choicesRules[myChoice]} points.");
+                return outcomeRules["Y"] + choicesRules[myChoice];
             }
             else
             {
                 if (choicesRules[opponentChoice] == 1 && choicesRules[myChoice] == 3)
                 {
-                    Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win {outcomeRules["lose"] + choicesRules[myChoice]} points.");
-                    return outcomeRules["lose"] + choicesRules[myChoice];
+                    //Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win {outcomeRules["lose"] + choicesRules[myChoice]} points.");
+                    return outcomeRules["X"] + choicesRules[myChoice];
                 }
-                Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
-                return outcomeRules["victory"] + choicesRules[myChoice];
+                //Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
+                return outcomeRules["Z"] + choicesRules[myChoice];
             }
         }
     }
@@ -135,7 +205,7 @@ namespace AoC2022_Exo2
                 "A Y",
                 "B Z"
             };
-            rounds = Program.InitRounds(entry);
+            rounds = Program.InitRounds(entry, "01");
             Assert.AreEqual(rounds.Count(), 2);
         }
         [TestMethod]
