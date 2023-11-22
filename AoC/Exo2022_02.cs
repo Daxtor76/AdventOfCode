@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -29,7 +30,7 @@ namespace AoC2022_Exo2
         {
             { "lose", 0 },
             { "draw", 3 },
-            { "victory", 6 },
+            { "victory", 6 }
         };
         public static void Main()
         {
@@ -46,9 +47,10 @@ namespace AoC2022_Exo2
             int tmpScore = 0;
             foreach (Round round in rounds)
             {
-                tmpScore += round.CalculateMyScore(choicesRules, outcomeRules);
+                int roundScore = round.CalculateMyScore(choicesRules, outcomeRules);
+                tmpScore += roundScore;
+                Console.WriteLine($"+{roundScore}. New total: {tmpScore}");
             }
-            Console.WriteLine(tmpScore);
 
             return tmpScore;
         }
@@ -88,17 +90,17 @@ namespace AoC2022_Exo2
 
             if (choicesRules[opponentChoice] > choicesRules[myChoice])
             {
-                Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win { outcomeRules["lose"] + choicesRules[myChoice] } points.");
+                //Console.WriteLine($"LOSE : {opponentChoice} vs {myChoice} -> you win { outcomeRules["lose"] + choicesRules[myChoice] } points.");
                 return outcomeRules["lose"] + choicesRules[myChoice];
             }
             else if (choicesRules[opponentChoice] == choicesRules[myChoice])
             {
-                Console.WriteLine($"DRAW : {opponentChoice} vs {myChoice} -> you win {outcomeRules["draw"] + choicesRules[myChoice]} points.");
+                //Console.WriteLine($"DRAW : {opponentChoice} vs {myChoice} -> you win {outcomeRules["draw"] + choicesRules[myChoice]} points.");
                 return outcomeRules["draw"] + choicesRules[myChoice];
             }
             else
             {
-                Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
+                //Console.WriteLine($"VICTORY : {opponentChoice} vs {myChoice} -> you win {outcomeRules["victory"] + choicesRules[myChoice]} points.");
                 return outcomeRules["victory"] + choicesRules[myChoice];
             }
         }
@@ -117,7 +119,7 @@ namespace AoC2022_Exo2
                 "B Z"
             };
             rounds = Program.InitRounds(entry);
-            Assert.AreEqual(entry.Length, rounds.Count(), 1);
+            Assert.AreEqual(rounds.Count(), 2);
         }
         [TestMethod]
         public void TestVictory()
