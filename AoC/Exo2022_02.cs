@@ -142,11 +142,6 @@ namespace AoC2022_Exo2
             }
         }
 
-        public string GetChoiceStringByValue(int value)
-        {
-            return ((Program.MyChoicesRules)value).ToString();
-        }
-
         public int CalculateMyScore(Dictionary<string, int> choicesRules, Dictionary<string, int> outcomeRules)
         {
             // This function allows to calculate my score in this round
