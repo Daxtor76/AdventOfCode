@@ -41,7 +41,7 @@ namespace AoC2022_Exo2
             int myFinalScore = CalculateFinalScore(choicesRules, outcomeRules, rounds);
         }
 
-        static int CalculateFinalScore(Dictionary<string, int> choicesRules, Dictionary<string, int> outcomeRules, List<Round> rounds)
+        public static int CalculateFinalScore(Dictionary<string, int> choicesRules, Dictionary<string, int> outcomeRules, List<Round> rounds)
         {
             int tmpScore = 0;
             foreach (Round round in rounds)
@@ -53,7 +53,7 @@ namespace AoC2022_Exo2
             return tmpScore;
         }
 
-        static List<Round> InitRounds(string[] data)
+        public static List<Round> InitRounds(string[] data)
         {
             List<Round> tmpRounds = new List<Round>();
             for (int i = 0; i < data.Length; i++)
@@ -109,11 +109,45 @@ namespace AoC2022_Exo2
     {
         public List<Round> rounds = new List<Round>();
         [TestMethod]
+        public void TestInitRound()
+        {
+            string[] entry = new string[]
+            {
+                "A Y",
+                "B Z"
+            };
+            rounds = Program.InitRounds(entry);
+            Assert.AreEqual(entry.Length, rounds.Count(), 1);
+        }
+        [TestMethod]
         public void TestVictory()
         {
-            // A Y => I win with 8
+            // A Y => I win with 8pts
             rounds.Add(new Round("A", "Y"));
             Assert.AreEqual(rounds[0].CalculateMyScore(Program.choicesRules, Program.outcomeRules), 8);
+        }
+        [TestMethod]
+        public void TestLose()
+        {
+            // B X => I lose with 1pt
+            rounds.Add(new Round("B", "X"));
+            Assert.AreEqual(rounds[0].CalculateMyScore(Program.choicesRules, Program.outcomeRules), 1);
+        }
+        [TestMethod]
+        public void TestDraw()
+        {
+            // C Z => draw with 6pts
+            rounds.Add(new Round("C", "Z"));
+            Assert.AreEqual(rounds[0].CalculateMyScore(Program.choicesRules, Program.outcomeRules), 6);
+        }
+        [TestMethod]
+        public void TestGlobalScore()
+        {
+            // All previous scores added, total 15
+            rounds.Add(new Round("A", "Y"));
+            rounds.Add(new Round("B", "X"));
+            rounds.Add(new Round("C", "Z"));
+            Assert.AreEqual(Program.CalculateFinalScore(Program.choicesRules, Program.outcomeRules, rounds), 15);
         }
     }
 }
