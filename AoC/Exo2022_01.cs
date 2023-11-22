@@ -13,7 +13,7 @@ namespace AoC2022_Exo1
     {
         public static void Main()
         {
-            string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Sample.txt");
+            string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2022_01.txt");
             string[] textSplitted = text.Split(Environment.NewLine);
             List<Elf> elves = [new Elf(0)];
             int counter = 0;
