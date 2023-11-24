@@ -33,24 +33,21 @@ namespace AoC2022_Exo3
             //Console.WriteLine(Convert.ToInt32(char.Parse("A"))); // 65
             //Console.WriteLine(Convert.ToInt32(char.Parse("Z"))); // 90
 
-            firstCompartment = GetInitialCompartments(textSplitted, out List<string> secondHalfList);
-            secondCompartment = secondHalfList;
-            totalScore = GetTotalScore(firstCompartment, secondCompartment);
+            totalScore = GetTotalScore(textSplitted);
         }
 
-        static int GetTotalScore(params List<string>[] compartments)
+        static int GetTotalScore(string[] backpacks)
         {
             int value = 0;
 
-            for (int i = 0; i < compartments[0].Count; i++)
+            for (int i = 0; i < backpacks.Count(); i++)
             {
-                Assert.IsTrue(compartments[0][i].Count() == compartments[1][i].Count(), $"Compartments of bag {i} are not same size.");
+                string part1 = backpacks[i].Substring(0, backpacks[i].Length/2);
+                string part2 = backpacks[i].Substring(backpacks[i].Length/2);
 
-                for (int y = 0; y < compartments[1][i].Count(); y++)
-                {
-                    value += GetCommonLettersValue(compartments[0][i], compartments[1][i]);
-                    break;
-                }
+                Assert.IsTrue(part1.Length == part2.Length, $"Compartments of bag {i} are not same size.");
+
+                value += GetCommonLettersValue(part1, part2);
             }
             Console.WriteLine(value);
 
@@ -70,7 +67,7 @@ namespace AoC2022_Exo3
             {
                 Assert.IsNotNull(c, $"No common char between {str1} and {str2}");
 
-                Console.WriteLine($"common char: {c}");
+                Console.WriteLine($"common char: {c}({lettersPriorities[c]})");
                 value += lettersPriorities[c];
             }
 
@@ -92,23 +89,6 @@ namespace AoC2022_Exo3
             }
 
             return tmpDico;
-        }
-
-        static List<string> GetInitialCompartments(string[] data, out List<string> secondHalfList)
-        {
-            List<string> tmpList = new List<string>();
-            secondHalfList = new List<string>();
-
-            for (int i = 0; i < data.Length; i++)
-            {
-                string firstHalf = data[i].Substring(0, data[i].Length / 2);
-                string secondHalf = data[i].Substring(data[i].Length / 2);
-
-                tmpList.Add(firstHalf);
-                secondHalfList.Add(secondHalf);
-            }
-
-            return tmpList;
         }
     }
 }
