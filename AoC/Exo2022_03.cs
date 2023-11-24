@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NuGet.Frameworks;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +17,7 @@ namespace AoC2022_Exo3
     */
     public class Program
     {
+        // ICI LA LES VARIABLES, PAS EN DESSOUS -_-
         public static void Main()
         {
             string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2022_03.txt");
@@ -58,18 +60,21 @@ namespace AoC2022_Exo3
         static int GetCommonLettersValue(string str1, string str2)
         {
             Dictionary<char, int> lettersPriorities = new Dictionary<char, int>();
+            HashSet<char> chars1 = new HashSet<char>(str1.ToCharArray());
+            HashSet<char> chars2 = new HashSet<char>(str2.ToCharArray());
+            int value = 0;
 
             lettersPriorities = GetPriorities();
-            for (int i = 0; i < str2.Length; i++)
+
+            foreach (char c in chars1.Intersect(chars2))
             {
-                if (str1.Contains(str2[i], StringComparison.Ordinal))
-                {
-                    Console.WriteLine($"Common char: {str2[i]}({lettersPriorities[str2[i]]})");
-                    return lettersPriorities[str2[i]];
-                }
+                Assert.IsNotNull(c, $"No common char between {str1} and {str2}");
+
+                Console.WriteLine($"common char: {c}");
+                value += lettersPriorities[c];
             }
 
-            return 0;
+            return value;
         }
 
         static Dictionary<char, int> GetPriorities()
@@ -85,11 +90,6 @@ namespace AoC2022_Exo3
             {
                 tmpDico.Add((char)(64 + i), i+26);
             }
-
-            /*foreach (KeyValuePair<char, int> kvp in tmpDico)
-            {
-                Console.WriteLine($"Key: {kvp.Key} / Value: {kvp.Value}");
-            }*/
 
             return tmpDico;
         }
