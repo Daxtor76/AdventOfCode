@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 using NuGet.Frameworks;
 using System;
 using System.Collections.Generic;
@@ -18,13 +19,15 @@ namespace AoC2022_Exo3
     public class Program
     {
         // ICI LA LES VARIABLES, PAS EN DESSOUS -_-
+        public static Dictionary<char, int> lettersPriorities = new Dictionary<char, int>();
         public static void Main()
         {
             string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2022_03.txt");
             string[] textSplitted = text.Split(Environment.NewLine);
-            List<string> firstCompartment = new List<string>();
-            List<string> secondCompartment = new List<string>();
-            int totalScore = 0;
+            int totalScoreByBackpack = 0;
+            int totalScoreByGroup = 0;
+
+            lettersPriorities = GetPriorities();
 
             // Debug to get ascii values of chars
             //Console.WriteLine(((char)65).ToString()); //A
@@ -33,41 +36,86 @@ namespace AoC2022_Exo3
             //Console.WriteLine(Convert.ToInt32(char.Parse("A"))); // 65
             //Console.WriteLine(Convert.ToInt32(char.Parse("Z"))); // 90
 
-            totalScore = GetTotalScore(textSplitted);
+            //totalScoreByBackpack = GetTotalScoreByBackPack(textSplitted);
+            totalScoreByGroup = GetTotalScoreByGroup(textSplitted, 3);
         }
 
-        static int GetTotalScore(string[] backpacks)
+        static int GetTotalScoreByGroup(string[] backPacks, int groupLength)
         {
             int value = 0;
 
-            for (int i = 0; i < backpacks.Count(); i++)
+            for (int i = 0; i < backPacks.Count(); i+=groupLength)
             {
-                string part1 = backpacks[i].Substring(0, backpacks[i].Length/2);
-                string part2 = backpacks[i].Substring(backpacks[i].Length/2);
-
-                Assert.IsTrue(part1.Length == part2.Length, $"Compartments of bag {i} are not same size.");
-
-                value += GetCommonLettersValue(part1, part2);
+                HashSet<char> c = GetCommonLetters(backPacks[i], backPacks[i + 1]);
+                value += GetCommonLettersValue(c, backPacks[i+2]);
             }
             Console.WriteLine(value);
 
             return value;
         }
 
-        static int GetCommonLettersValue(string str1, string str2)
+        static int GetTotalScoreByBackPack(string[] backPacks)
         {
-            Dictionary<char, int> lettersPriorities = new Dictionary<char, int>();
-            HashSet<char> chars1 = new HashSet<char>(str1.ToCharArray());
-            HashSet<char> chars2 = new HashSet<char>(str2.ToCharArray());
             int value = 0;
 
-            lettersPriorities = GetPriorities();
+            for (int i = 0; i < backPacks.Count(); i++)
+            {
+                string part1 = backPacks[i].Substring(0, backPacks[i].Length/2);
+                string part2 = backPacks[i].Substring(backPacks[i].Length/2);
+
+                Assert.IsTrue(part1.Length == part2.Length, $"Compartments of bag {i} are not same size.");
+
+                value += GetCommonLettersValue(part1, part2);
+            }
+            //Console.WriteLine(value);
+
+            return value;
+        }
+
+        static HashSet<char> GetCommonLetters(string str1, string str2)
+        {
+            HashSet<char> chars1 = new HashSet<char>(str1.ToCharArray());
+            HashSet<char> chars2 = new HashSet<char>(str2.ToCharArray());
+            HashSet<char> common = new();
 
             foreach (char c in chars1.Intersect(chars2))
             {
                 Assert.IsNotNull(c, $"No common char between {str1} and {str2}");
 
                 Console.WriteLine($"common char: {c}({lettersPriorities[c]})");
+                common.Add(c);
+            }
+
+            return common;
+        }
+
+        static int GetCommonLettersValue(string str1, string str2)
+        {
+            HashSet<char> chars1 = new HashSet<char>(str1.ToCharArray());
+            HashSet<char> chars2 = new HashSet<char>(str2.ToCharArray());
+            int value = 0;
+
+            foreach (char c in chars1.Intersect(chars2))
+            {
+                Assert.IsNotNull(c, $"No common char between {str1} and {str2}");
+
+                Console.WriteLine($"Finalcommon char: {c}({lettersPriorities[c]})");
+                value += lettersPriorities[c];
+            }
+
+            return value;
+        }
+
+        static int GetCommonLettersValue(HashSet<char> chars, string str2)
+        {
+            HashSet<char> chars2 = new HashSet<char>(str2.ToCharArray());
+            int value = 0;
+
+            foreach (char c in chars.Intersect(chars2))
+            {
+                Assert.IsNotNull(c, $"No common char between {chars} and {str2}");
+
+                Console.WriteLine($"Final common char: {c}({lettersPriorities[c]})");
                 value += lettersPriorities[c];
             }
 
