@@ -1,11 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using AoC2022_Exo2;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NuGet.Frameworks;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,124 +23,122 @@ namespace AoC2022_Exo4
     public class Program
     {
         // ICI LA LES VARIABLES, PAS EN DESSOUS -_-
-        public static Dictionary<char, int> lettersPriorities = new Dictionary<char, int>();
         public static void Main()
         {
-            string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2022_03.txt");
+            string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2022_04.txt");
             string[] textSplitted = text.Split(Environment.NewLine);
-            int totalScoreByBackpack = 0;
-            int totalScoreByGroup = 0;
+            int totalContained = 0;
+            int totalOverlap = 0;
 
-            lettersPriorities = GetPriorities();
+            for (int i = 0; i < textSplitted.Length; i++)
+            {
+                totalContained += isContained(textSplitted[i].ToString());
+                totalOverlap += isOverlap(textSplitted[i].ToString());
+            }
 
-            // Debug to get ascii values of chars
-            //Console.WriteLine(((char)65).ToString()); //A
-            //Console.WriteLine(Convert.ToInt32(char.Parse("a"))); // 97
-            //Console.WriteLine(Convert.ToInt32(char.Parse("z"))); // 122
-            //Console.WriteLine(Convert.ToInt32(char.Parse("A"))); // 65
-            //Console.WriteLine(Convert.ToInt32(char.Parse("Z"))); // 90
-
-            //totalScoreByBackpack = GetTotalScoreByBackPack(textSplitted);
-            totalScoreByGroup = GetTotalScoreByGroup(textSplitted, 3);
+            Console.WriteLine(textSplitted.Length);
+            Console.WriteLine(totalContained);
+            Console.WriteLine(totalOverlap);
         }
 
-        static int GetTotalScoreByGroup(string[] backPacks, int groupLength)
+        public static int isContained(string ens)
         {
-            int value = 0;
-
-            for (int i = 0; i < backPacks.Count(); i+=groupLength)
+            string[] delimitators = new string[2]
             {
-                HashSet<char> c = GetCommonLetters(backPacks[i], backPacks[i + 1]);
-                value += GetCommonLettersValue(c, backPacks[i+2]);
-            }
-            Console.WriteLine(value);
+                "-",
+                ","
+            };
+            string[] tab = ens.Split(delimitators, 4, StringSplitOptions.None);
 
-            return value;
+            int range1Start = int.Parse(tab[0]);
+            int range1End = int.Parse(tab[1]);
+            int range2Start = int.Parse(tab[2]);
+            int range2End = int.Parse(tab[3]);
+
+            // FOOTGUN => C'EST DE LA MERDE
+            // Faire des classes propres svp
+            bool twoContainsOne = isContained(range1Start, range1End, range2Start, range2End);
+            bool oneContainsTwo = isContained(range2Start, range2End, range1Start, range1End);
+            if (oneContainsTwo||twoContainsOne)
+            {
+                return 1;
+            }
+            return 0;
         }
 
-        static int GetTotalScoreByBackPack(string[] backPacks)
+        private static bool isContained(int range1Start, int range1End, int range2Start, int range2End)
         {
-            int value = 0;
+            bool startOk = range1Start >= range2Start;
+            bool endOk = range1End <= range2End;
 
-            for (int i = 0; i < backPacks.Count(); i++)
-            {
-                string part1 = backPacks[i].Substring(0, backPacks[i].Length/2);
-                string part2 = backPacks[i].Substring(backPacks[i].Length/2);
-
-                Assert.IsTrue(part1.Length == part2.Length, $"Compartments of bag {i} are not same size.");
-
-                value += GetCommonLettersValue(part1, part2);
-            }
-            //Console.WriteLine(value);
-
-            return value;
+            return startOk && endOk;
         }
 
-        static HashSet<char> GetCommonLetters(string str1, string str2)
+        public static int isOverlap(string ens)
         {
-            HashSet<char> chars1 = new HashSet<char>(str1.ToCharArray());
-            HashSet<char> chars2 = new HashSet<char>(str2.ToCharArray());
-            HashSet<char> common = new();
-
-            foreach (char c in chars1.Intersect(chars2))
+            string[] delimitators = new string[2]
             {
-                Assert.IsNotNull(c, $"No common char between {str1} and {str2}");
+                "-",
+                ","
+            };
+            string[] tab = ens.Split(delimitators, 4, StringSplitOptions.None);
 
-                Console.WriteLine($"common char: {c}({lettersPriorities[c]})");
-                common.Add(c);
+            int range1Start = int.Parse(tab[0]);
+            int range1End = int.Parse(tab[1]);
+            int range2Start = int.Parse(tab[2]);
+            int range2End = int.Parse(tab[3]);
+
+            // FOOTGUN => C'EST DE LA MERDE
+            // Faire des classes propres svp
+            bool isOverlapping = isOverlap(range1Start, range1End, range2Start, range2End);
+            if (isOverlapping)
+            {
+                return 1;
             }
-
-            return common;
+            return 0;
         }
 
-        static int GetCommonLettersValue(string str1, string str2)
+        private static bool isOverlap(int range1Start, int range1End, int range2Start, int range2End)
         {
-            HashSet<char> chars1 = new HashSet<char>(str1.ToCharArray());
-            HashSet<char> chars2 = new HashSet<char>(str2.ToCharArray());
-            int value = 0;
+            bool startOk = range1Start >= range2Start && range1Start <= range2End;
+            bool endOk = range1End <= range2End && range1End >= range2Start;
 
-            foreach (char c in chars1.Intersect(chars2))
-            {
-                Assert.IsNotNull(c, $"No common char between {str1} and {str2}");
-
-                Console.WriteLine($"Finalcommon char: {c}({lettersPriorities[c]})");
-                value += lettersPriorities[c];
-            }
-
-            return value;
+            return startOk || endOk;
+        }
+    }
+    [TestClass]
+    public class Tests
+    {
+        [TestMethod]
+        public void Test()
+        {
+            Assert.AreEqual(1, Program.isContained("6-6,4-6"));
+            Assert.AreEqual(1, Program.isContained("4-6,6-6"));
+            Assert.AreEqual(1, Program.isContained("2-8,3-7"));
+            Assert.AreEqual(0, Program.isContained("0-1,3-7"));
+            Assert.AreEqual(1, Program.isContained("2-16,15-16"));
+            Assert.AreEqual(1, Program.isContained("1-5,1-3"));
+            Assert.AreEqual(1, Program.isContained("0-1000,300-400"));
+            Assert.AreEqual(0, Program.isContained("1000-2000,3000-4000"));
+            Assert.AreEqual(1, Program.isContained("1000-1000,1000-1000"));
         }
 
-        static int GetCommonLettersValue(HashSet<char> chars, string str2)
+        public string test = @"2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8"; 
+        [TestMethod]
+        public void TestTotal()
         {
-            HashSet<char> chars2 = new HashSet<char>(str2.ToCharArray());
-            int value = 0;
-
-            foreach (char c in chars.Intersect(chars2))
+            int totalContained = 0;
+            string[] testSplitted = test.Split(Environment.NewLine);
+            for (int i = 0; i < testSplitted.Length; i++)
             {
-                Assert.IsNotNull(c, $"No common char between {chars} and {str2}");
-
-                Console.WriteLine($"Final common char: {c}({lettersPriorities[c]})");
-                value += lettersPriorities[c];
+                totalContained += Program.isContained(testSplitted[i].ToString());
             }
-
-            return value;
-        }
-
-        static Dictionary<char, int> GetPriorities()
-        {
-            Dictionary<char, int> tmpDico = new();
-
-            for (int i = 1; i <= 26; i++)
-            {
-                tmpDico.Add((char)(96+i), i);
-            }
-
-            for (int i = 1; i <= 26; i++)
-            {
-                tmpDico.Add((char)(64 + i), i+26);
-            }
-
-            return tmpDico;
+            Assert.AreEqual(2, totalContained);
         }
     }
 }
