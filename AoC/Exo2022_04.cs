@@ -36,7 +36,6 @@ namespace AoC2022_Exo4
                 totalOverlap += isOverlap(textSplitted[i].ToString());
             }
 
-            Console.WriteLine(textSplitted.Length);
             Console.WriteLine(totalContained);
             Console.WriteLine(totalOverlap);
         }
@@ -90,8 +89,9 @@ namespace AoC2022_Exo4
 
             // FOOTGUN => C'EST DE LA MERDE
             // Faire des classes propres svp
-            bool isOverlapping = isOverlap(range1Start, range1End, range2Start, range2End);
-            if (isOverlapping)
+            bool isOneOverlapping = isOverlap(range1Start, range1End, range2Start, range2End);
+            bool isTwoOverlapping = isOverlap(range2Start, range2End, range1Start, range1End);
+            if (isOneOverlapping || isTwoOverlapping)
             {
                 return 1;
             }
