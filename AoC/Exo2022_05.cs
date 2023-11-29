@@ -39,7 +39,8 @@ namespace AoC2022_Exo5
 
             foreach (Instruction instr in instructions)
             {
-                instr.Apply(stacks);
+                //instr.ApplyFirstMover(stacks);
+                instr.ApplySecondMover(stacks);
             }
 
             string finalStr = GetResult(stacks);
@@ -138,13 +139,23 @@ namespace AoC2022_Exo5
             _to = int.Parse(instrValues[2]);
         }
 
-        public void Apply(Dictionary<int, List<char>> stacks)
+        public void ApplyFirstMover(Dictionary<int, List<char>> stacks)
         {
             for (int i = 0; i < _amount; i++)
             {
                 stacks[_to].Add(stacks[_from][^1]);
                 Console.WriteLine($"Moved {stacks[_from][^1]} from stack {_from} to {_to}");
                 stacks[_from].RemoveAt(stacks[_from].Count - 1);
+            }
+        }
+
+        public void ApplySecondMover(Dictionary<int, List<char>> stacks)
+        {
+            for (int i = _amount - 1; i > -1; i--)
+            {
+                stacks[_to].Add(stacks[_from][stacks[_from].Count - 1 - i]);
+                Console.WriteLine($"Moved {stacks[_from][^1]} from stack {_from} to {_to}");
+                stacks[_from].RemoveAt(stacks[_from].Count - 1 - i);
             }
         }
     }
