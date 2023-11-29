@@ -2,10 +2,12 @@
 using Newtonsoft.Json.Linq;
 using NuGet.Frameworks;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -33,6 +35,55 @@ namespace AoC2022_Exo5
             string[] textSplitted = text.Split(Environment.NewLine);
             List<string> textFormatted = FormatText(textSplitted);
             List<Instruction> instructions = GetInstructions(textFormatted);
+            Dictionary<int, List<char>> stacks = GetStacks(textFormatted);
+
+            foreach (Instruction instr in instructions)
+            {
+                instr.Apply(stacks);
+            }
+
+            string finalStr = GetResult(stacks);
+            Console.WriteLine(finalStr);
+        }
+
+        private static string GetResult(Dictionary<int, List<char>> stacks)
+        {
+            string tmp = "";
+            foreach (List<char> list in stacks.Values)
+            {
+                tmp += list[^1];
+            }
+
+            return tmp;
+        }
+
+        private static Dictionary<int, List<char>> GetStacks(List<string> textFormatted)
+        {
+            Dictionary<int, List<char>> tmpDic = new Dictionary<int, List<char>>();
+            for (int i = 0; i < textFormatted.Count; i++)
+            {
+                string line = textFormatted[i];
+                if (!line.Contains("1-"))
+                {
+                    for (int y = 0; y < line.Length; y++)
+                    {
+                        if (!tmpDic.ContainsKey(y + 1))
+                            tmpDic.Add(y + 1, new List<char>());
+
+                        if (line[y] != (char)45)
+                            tmpDic[y + 1]?.Add(line[y]);
+                    }
+                }
+                else
+                    break;
+            }
+
+            foreach (List<char> list in tmpDic.Values)
+            {
+                list.Reverse();
+            }
+
+            return tmpDic;
         }
 
         private static List<Instruction> GetInstructions(List<string> textFormatted)
@@ -59,12 +110,13 @@ namespace AoC2022_Exo5
             {
                 string newString = line;
 
+                newString = newString.Replace("    ", "- ");
                 newString = newString.Replace("   ", "-");
                 newString = newString.Replace(" ", "");
                 newString = newString.Replace("[", "");
                 newString = newString.Replace("]", "");
                 result.Add(newString);
-                //Console.WriteLine(newString);
+                Console.WriteLine(newString);
             }
 
             return result;
@@ -85,7 +137,18 @@ namespace AoC2022_Exo5
             _from = int.Parse(instrValues[1]);
             _to = int.Parse(instrValues[2]);
         }
+
+        public void Apply(Dictionary<int, List<char>> stacks)
+        {
+            for (int i = 0; i < _amount; i++)
+            {
+                stacks[_to].Add(stacks[_from][^1]);
+                Console.WriteLine($"Moved {stacks[_from][^1]} from stack {_from} to {_to}");
+                stacks[_from].RemoveAt(stacks[_from].Count - 1);
+            }
+        }
     }
+
     [TestClass]
     public class Tests
     {
