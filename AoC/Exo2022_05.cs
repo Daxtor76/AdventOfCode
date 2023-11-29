@@ -19,23 +19,34 @@ namespace AoC2022_Exo5
     public class Program
     {
         // ICI LA LES VARIABLES, PAS EN DESSOUS -_-
-        static List<Instruction> instructions = new List<Instruction>();
+        public static List<Instruction> instructions = new List<Instruction>();
+        public static string[] instrSeparators = new string[]
+        {
+            "move",
+            "from",
+            "to"
+        };
+
         public static void Main()
         {
             string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2022_05.txt");
             string[] textSplitted = text.Split(Environment.NewLine);
             List<string> textFormatted = FormatText(textSplitted);
-            
-            instructions = GetInstructions(textFormatted);
+            List<Instruction> instructions = GetInstructions(textFormatted);
         }
 
-        private static List<Instruction> GetInstructions(List<string> rawInstructions)
+        private static List<Instruction> GetInstructions(List<string> textFormatted)
         {
             List<Instruction> tmpList = new List<Instruction>();
-
-            foreach (string line in rawInstructions)
+            foreach (string line in textFormatted)
             {
-                tmpList.Add(new Instruction(line));
+                if (line.Contains(instrSeparators[0]) || line.Contains(instrSeparators[1]) || line.Contains(instrSeparators[2]))
+                {
+                    Instruction instr = new Instruction(line);
+                    tmpList.Add(instr);
+
+                    Console.WriteLine($"move : {instr._amount} from : {instr._from} to {instr._to}");
+                }
             }
 
             return tmpList;
@@ -47,17 +58,13 @@ namespace AoC2022_Exo5
             foreach (string line in textSplitted)
             {
                 string newString = line;
-                char leftCrochet = (char)91;
-                char rightCrochet = (char)93;
-                char space = (char)32;
-                char nothing = (char)0;
 
                 newString = newString.Replace("   ", "-");
-                newString = newString.Replace(leftCrochet, nothing);
-                newString = newString.Replace(rightCrochet, nothing);
-                newString = newString.Replace(space, nothing);
+                newString = newString.Replace(" ", "");
+                newString = newString.Replace("[", "");
+                newString = newString.Replace("]", "");
                 result.Add(newString);
-                Console.WriteLine(newString);
+                //Console.WriteLine(newString);
             }
 
             return result;
@@ -69,17 +76,11 @@ namespace AoC2022_Exo5
         public int _amount;
         public int _from;
         public int _to;
-        string[] separators = new string[]
-        {
-            "move",
-            "from",
-            "to"
-        };
 
         public Instruction(string rawInstr) : this()
         {
             string raw = rawInstr.Replace(" ", "");
-            string[] instrValues = raw.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            string[] instrValues = raw.Split(Program.instrSeparators, StringSplitOptions.RemoveEmptyEntries);
             _amount = int.Parse(instrValues[0]);
             _from = int.Parse(instrValues[1]);
             _to = int.Parse(instrValues[2]);
