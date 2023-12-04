@@ -17,8 +17,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace AoC2023_Exo1
 {
     /*
-     Former un nombre avec les deux chiffres (premier et dernier) char de chaque string
-     Faire la somme de tout ça
+    * 53293 too low
     */
     public class Program
     {
@@ -34,19 +33,19 @@ namespace AoC2023_Exo1
             /*foreach (string line in textSplitted)
             {
                 total += ExtractNumbersFromString(line);
-            }
-
-            Console.WriteLine(total);*/
+            }*/
 
             //Step 2
-            /*foreach (string line in textSplitted)
+            foreach (string line in textSplitted)
             {
-                total += GetIntFromLetters(SplittedInput(line));
-            }*/
-            GetIntFromLetters(SplittedInput("abcninetytwoabc"));
+                Console.WriteLine($"{line} -> {ChangeLettersToDigits(SplittedInputLeftToRight(line))} -> {ExtractNumbersFromString(ChangeLettersToDigits(SplittedInputLeftToRight(line)))}");
+                total += ExtractNumbersFromString(ChangeLettersToDigits(SplittedInputLeftToRight(line)));
+            }
+
+            Console.WriteLine(total);
         }
 
-        public static int GetIntFromLetters(string[] inputSplitted)
+        public static string ChangeLettersToDigits(string[] inputSplitted)
         {
             Dictionary<string, int> db = new Dictionary<string, int>()
             {
@@ -58,49 +57,27 @@ namespace AoC2023_Exo1
                 { "six", 6 },
                 { "seven", 7 },
                 { "eight", 8 },
-                { "nine" , 9},
-                { "ten" , 10},
-                { "eleven" , 11},
-                { "twelve" , 12},
-                { "thirteen" , 13},
-                { "fifteen" , 15},
-                { "twenty" , 20},
-                { "thirty" , 30},
-                { "fifty" , 50}
+                { "nine" , 9}
             };
 
-            int lettersInInt = 0;
+            string lettersInDigits = "";
             for (int i = 0; i < inputSplitted.Length; i++)
             {
-                if (!db.ContainsKey(inputSplitted[i]) || char.IsDigit(inputSplitted[i].ToCharArray().First()))
+                if (db.ContainsKey(inputSplitted[i]) || char.IsDigit(inputSplitted[i].First()))
                 {
-                    continue;
+                    lettersInDigits += db.ContainsKey(inputSplitted[i]) ? db[inputSplitted[i]].ToString() : inputSplitted[i].ToString();
                 }
                 else
                 {
-                    if (inputSplitted.Length == 1)
-                        lettersInInt = db[inputSplitted[i]];
-                    if (inputSplitted.Length > 1)
-                    {
-                        lettersInInt = db[inputSplitted[i]];
-                        if (inputSplitted[i+1] == "ty")
-                            lettersInInt *= 10;
-                        else if (inputSplitted[i+1] == "teen")
-                            lettersInInt += 10;
-                        i += 1;
-                    }
-                    if (inputSplitted.Length > 2)
-                    {
-                        lettersInInt += db[inputSplitted[i+2]];
-                        i += 1;
-                    }
+                    continue;
                 }
             }
-
-            return lettersInInt;
+            //Console.WriteLine($"formatted string : {lettersInDigits}");
+            
+            return lettersInDigits;
         }
 
-        private static string[] SplittedInput(string input)
+        public static string[] SplittedInputLeftToRight(string input)
         {
             Dictionary<string, int> db = new Dictionary<string, int>()
             {
@@ -112,20 +89,60 @@ namespace AoC2023_Exo1
                 { "six", 6 },
                 { "seven", 7 },
                 { "eight", 8 },
-                { "nine" , 9},
-                { "ten" , 10},
-                { "eleven" , 11},
-                { "twelve" , 12},
-                { "thirteen" , 13},
-                { "fifteen" , 15},
-                { "twenty" , 20},
-                { "thirty" , 30},
-                { "fifty" , 50}
+                { "nine" , 9}
             };
             string strRegex = GetAllDBKeysFormatted(db);
-            Regex regex = new Regex(strRegex);
-            string[] inputSplitted = regex.Split(input);
-            inputSplitted = inputSplitted.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            //Regex regex = new Regex(strRegex);
+            List<string> inputSplitted = new List<string>();
+
+            try
+            {
+                foreach (Match match in Regex.Matches(input, strRegex))
+                {
+                    inputSplitted.Add(match.Value);
+                }
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                // do nothing
+            }
+
+            inputSplitted.Add(SplittedInputRightToLeft(input)[0]);
+            
+            //inputSplitted = inputSplitted.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            return inputSplitted.ToArray();
+        }
+
+        public static List<string> SplittedInputRightToLeft(string input)
+        {
+            Dictionary<string, int> db = new Dictionary<string, int>()
+            {
+                { "one", 1 },
+                { "two", 2 },
+                { "three", 3 },
+                { "four", 4 },
+                { "five", 5 },
+                { "six", 6 },
+                { "seven", 7 },
+                { "eight", 8 },
+                { "nine" , 9}
+            };
+            string strRegex = GetAllDBKeysFormatted(db);
+            //Regex regex = new Regex(strRegex);
+            List<string> inputSplitted = new List<string>();
+
+            try
+            {
+                foreach (Match match in Regex.Matches(input, strRegex, RegexOptions.RightToLeft))
+                {
+                    inputSplitted.Add(match.Value);
+                }
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                // do nothing
+            }
+
             return inputSplitted;
         }
 
@@ -135,6 +152,8 @@ namespace AoC2023_Exo1
             foreach (string s in db.Keys)
             {
                 tmp += s;
+                tmp += "|";
+                tmp += db[s].ToString();
                 tmp += "|";
             }
             tmp = tmp.Substring(0, tmp.Length - 1);
@@ -206,7 +225,7 @@ namespace AoC2023_Exo1
             string result = text.ToList().First(char.IsDigit).ToString();
             result += text.ToList().Last(char.IsDigit).ToString();
 
-            //Console.WriteLine($"{int.Parse(result)} -> {text}");
+            //Console.WriteLine($"{text} -> {int.Parse(result)}");
             return int.Parse(result);
         }
     }
@@ -220,6 +239,11 @@ namespace AoC2023_Exo1
             Assert.AreEqual(12, Program.ExtractNumbersFromString("12"));
             Assert.AreEqual(12, Program.ExtractNumbersFromString("1abc2"));
             Assert.AreEqual(15, Program.ExtractNumbersFromString("a1b2c3d4e5f"));
+        }
+        [TestMethod]
+        public void TestStep2()
+        {
+            Assert.AreEqual(88, Program.ExtractNumbersFromString(Program.ChangeLettersToDigits(Program.SplittedInputLeftToRight("eight"))));
         }
     }
 }
