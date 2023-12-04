@@ -38,8 +38,8 @@ namespace AoC2023_Exo1
             //Step 2
             foreach (string line in textSplitted)
             {
-                Console.WriteLine($"{line} -> {ChangeLettersToDigits(SplittedInputLeftToRight(line))} -> {ExtractNumbersFromString(ChangeLettersToDigits(SplittedInputLeftToRight(line)))}");
-                total += ExtractNumbersFromString(ChangeLettersToDigits(SplittedInputLeftToRight(line)));
+                Console.WriteLine($"{line} -> {ChangeLettersToDigits(SplittedInput(line))} -> {ExtractNumbersFromString(ChangeLettersToDigits(SplittedInput(line)))}");
+                total += ExtractNumbersFromString(ChangeLettersToDigits(SplittedInput(line)));
             }
 
             Console.WriteLine(total);
@@ -72,12 +72,11 @@ namespace AoC2023_Exo1
                     continue;
                 }
             }
-            //Console.WriteLine($"formatted string : {lettersInDigits}");
             
             return lettersInDigits;
         }
 
-        public static string[] SplittedInputLeftToRight(string input)
+        public static string[] SplittedInput(string input)
         {
             Dictionary<string, int> db = new Dictionary<string, int>()
             {
@@ -92,8 +91,8 @@ namespace AoC2023_Exo1
                 { "nine" , 9}
             };
             string strRegex = GetAllDBKeysFormatted(db);
-            //Regex regex = new Regex(strRegex);
             List<string> inputSplitted = new List<string>();
+            List<string> inputSplittedRightToLeft = new List<string>();
 
             try
             {
@@ -101,41 +100,9 @@ namespace AoC2023_Exo1
                 {
                     inputSplitted.Add(match.Value);
                 }
-            }
-            catch (RegexMatchTimeoutException)
-            {
-                // do nothing
-            }
-
-            inputSplitted.Add(SplittedInputRightToLeft(input)[0]);
-            
-            //inputSplitted = inputSplitted.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-            return inputSplitted.ToArray();
-        }
-
-        public static List<string> SplittedInputRightToLeft(string input)
-        {
-            Dictionary<string, int> db = new Dictionary<string, int>()
-            {
-                { "one", 1 },
-                { "two", 2 },
-                { "three", 3 },
-                { "four", 4 },
-                { "five", 5 },
-                { "six", 6 },
-                { "seven", 7 },
-                { "eight", 8 },
-                { "nine" , 9}
-            };
-            string strRegex = GetAllDBKeysFormatted(db);
-            //Regex regex = new Regex(strRegex);
-            List<string> inputSplitted = new List<string>();
-
-            try
-            {
                 foreach (Match match in Regex.Matches(input, strRegex, RegexOptions.RightToLeft))
                 {
-                    inputSplitted.Add(match.Value);
+                    inputSplittedRightToLeft.Add(match.Value);
                 }
             }
             catch (RegexMatchTimeoutException)
@@ -143,7 +110,10 @@ namespace AoC2023_Exo1
                 // do nothing
             }
 
-            return inputSplitted;
+            inputSplitted.Add(inputSplittedRightToLeft[0]);
+            
+            //inputSplitted = inputSplitted.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            return inputSplitted.ToArray();
         }
 
         private static string GetAllDBKeysFormatted(Dictionary<string, int> db)
@@ -225,7 +195,6 @@ namespace AoC2023_Exo1
             string result = text.ToList().First(char.IsDigit).ToString();
             result += text.ToList().Last(char.IsDigit).ToString();
 
-            //Console.WriteLine($"{text} -> {int.Parse(result)}");
             return int.Parse(result);
         }
     }
@@ -243,7 +212,8 @@ namespace AoC2023_Exo1
         [TestMethod]
         public void TestStep2()
         {
-            Assert.AreEqual(88, Program.ExtractNumbersFromString(Program.ChangeLettersToDigits(Program.SplittedInputLeftToRight("eight"))));
+            Assert.AreEqual(88, Program.ExtractNumbersFromString(Program.ChangeLettersToDigits(Program.SplittedInput("eight"))));
+            Assert.AreEqual(18, Program.ExtractNumbersFromString(Program.ChangeLettersToDigits(Program.SplittedInput("oneight"))));
         }
     }
 }
