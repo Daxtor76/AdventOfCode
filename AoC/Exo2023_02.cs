@@ -36,10 +36,33 @@ namespace AoC2023_Exo2
             games = GetGames(textSplitted);
 
             // STEP 1
-            Console.WriteLine($"Total possible games id: {CompareCubesOfAllGames(games)}");
+            //Console.WriteLine($"Total possible games id: {PossibleGamesTotalIds(games)}");
+
+            // STEP 2
+            Console.WriteLine($"Total largest sets values: {LargestSetsValues(games)}");
         }
 
-        public static int CompareCubesOfAllGames(List<Game> games)
+        public static int LargestSetsValues(List<Game> games)
+        {
+            int total = 0;
+
+            foreach (Game game in games)
+            {
+                Set largestSet = new Set();
+                foreach (Set set in game._sets)
+                {
+                    largestSet.cubes["red"] = set.cubes["red"] > largestSet.cubes["red"] ? set.cubes["red"] : largestSet.cubes["red"];
+                    largestSet.cubes["green"] = set.cubes["green"] > largestSet.cubes["green"] ? set.cubes["green"] : largestSet.cubes["green"];
+                    largestSet.cubes["blue"] = set.cubes["blue"] > largestSet.cubes["blue"] ? set.cubes["blue"] : largestSet.cubes["blue"];
+                }
+                Console.WriteLine($"Game largest set value: {largestSet.cubes["red"] * largestSet.cubes["green"] * largestSet.cubes["blue"]}");
+                total += largestSet.cubes["red"] * largestSet.cubes["green"] * largestSet.cubes["blue"];
+            }
+
+            return total;
+        }
+
+        public static int PossibleGamesTotalIds(List<Game> games)
         {
             int total = 0;
             for (int i = 0; i < games.Count; i++)
@@ -126,7 +149,7 @@ namespace AoC2023_Exo2
         public Game(List<Set> sets)
         {
             _sets = sets;
-        }   
+        }
     }
 
     public class Set
@@ -137,6 +160,15 @@ namespace AoC2023_Exo2
             {"green", 0},
             {"blue", 0}
         };
+
+        public Set() { }
+
+        public Set(int red, int green, int blue)
+        {
+            cubes["red"] = red;
+            cubes["green"] = green;
+            cubes["blue"] = blue;
+        }
     }
 
     [TestClass]
