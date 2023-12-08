@@ -25,7 +25,8 @@ namespace AoC2023_Exo4
     */
     public class Program
     {
-        public static List<Set> sets = new List<Set>();
+        public static Dictionary<Set, int> sets = new Dictionary<Set, int>();
+        //public static List<Set> setsStep2 = sets;
 
         public static void Main()
         {
@@ -37,16 +38,47 @@ namespace AoC2023_Exo4
                 "|",
             };
 
+            // STEP 1
+            //SplitCards(textSplitted, separators);
+            //Console.WriteLine($"Total: {CardsScores(sets)}");
+
+            // STEP 2
             SplitCards(textSplitted, separators);
-            Console.WriteLine($"Total: {CardsScores(sets)}");
+            // Parse chaque set
+            // Ajouter un set dont l'id est +1 pour chaque winning number
+            // Ranger la liste par ordre croissant
+            for (int i = 0; i < sets.Count(); i++)
+            {
+                Set currentSet = sets.Keys.ToList()[i];
+                int currentSetWinningNumbersAmount = GetWinningNumbersAmount(currentSet.winCard, currentSet.myCard);
+                for (int y = 0; y < currentSetWinningNumbersAmount; y++)
+                {
+                    Set setToAdd = sets.Keys.ToList()[i + y + 1];
+                    sets[setToAdd] += 1 * sets[currentSet];
+                }
+            }
+
+            Console.WriteLine($"Total: {TotalSets(sets)}");
         }
-        public static int CardsScores(List<Set> sets)
+
+        public static int TotalSets(Dictionary<Set, int> dico)
         {
             int total = 0;
 
-            for (int i = 0; i < sets.Count(); i++)
+            foreach (Set set in dico.Keys)
             {
-                total += sets[i].score;
+                total += dico[set];
+            }
+
+            return total;
+        }
+        public static int CardsScores(Dictionary<Set, int> dico)
+        {
+            int total = 0;
+
+            foreach (Set set in dico.Keys)
+            {
+                total += set.score;
             }
             return total;
         }
@@ -71,6 +103,7 @@ namespace AoC2023_Exo4
 
         public static void SplitCards(string[] input, string[] separators)
         {
+            int i = 0;
             foreach (string line in input)
             {
                 string[] formattedInput = line.Split(separators, StringSplitOptions.RemoveEmptyEntries).ToArray();
@@ -84,9 +117,10 @@ namespace AoC2023_Exo4
                 {
                     myCard.AddNumber(int.Parse(str));
                 }
-                Set set = new Set(winCard, myCard);
+                Set set = new Set(i, winCard, myCard);
                 set.score = set.myCard.CardScore(GetWinningNumbersAmount(set.winCard, set.myCard));
-                sets.Add(set);
+                i++;
+                sets.Add(set, 1);
             }
         }
     }
@@ -96,9 +130,11 @@ namespace AoC2023_Exo4
         public Card winCard = new Card();
         public Card myCard = new Card();
         public int score = 0;
+        public int id = 0;
 
-        public Set(Card _winCard, Card _myCard)
+        public Set(int _id, Card _winCard, Card _myCard)
         {
+            id = _id;
             winCard = _winCard;
             myCard = _myCard;
         }
