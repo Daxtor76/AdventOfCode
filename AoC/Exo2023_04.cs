@@ -25,8 +25,7 @@ namespace AoC2023_Exo4
     */
     public class Program
     {
-        public static List<Card> winCards = new List<Card>();
-        public static List<Card> myCards = new List<Card>();
+        public static List<Set> sets = new List<Set>();
 
         public static void Main()
         {
@@ -37,28 +36,32 @@ namespace AoC2023_Exo4
                 ":",
                 "|",
             };
-            int total = 0;
-            SplitCards(textSplitted, separators);
 
-            for (int i = 0; i < myCards.Count(); i++)
+            SplitCards(textSplitted, separators);
+            Console.WriteLine($"Total: {CardsScores(sets)}");
+        }
+        public static int CardsScores(List<Set> sets)
+        {
+            int total = 0;
+
+            for (int i = 0; i < sets.Count(); i++)
             {
-                total += myCards[i].CardScore(GetWinningNumbersAmount(winCards[i], myCards[i]));
+                total += sets[i].score;
             }
-            Console.WriteLine($"Total: {total}");
+            return total;
         }
 
         public static int GetWinningNumbersAmount(Card winCard, Card comparedCard)
         {
             int amount = 0;
 
-            foreach (int nb in winCard.numbers.Keys)
+            foreach (int nb in winCard.numbers)
             {
-                foreach (int otherNb in comparedCard.numbers.Keys)
+                foreach (int otherNb in comparedCard.numbers)
                 {
                     if (nb == otherNb)
                     {
                         amount++;
-                        winCard.numbers[nb] = true;
                     }
                 }
             }
@@ -76,35 +79,47 @@ namespace AoC2023_Exo4
                 foreach (string str in formattedInput[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray())
                 {
                     winCard.AddNumber(int.Parse(str));
-                    Console.WriteLine($"WinCard: {str}");
                 }
-                winCards.Add(winCard);
                 foreach (string str in formattedInput[2].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray())
                 {
                     myCard.AddNumber(int.Parse(str));
-                    Console.WriteLine($"MyCard: {str}");
                 }
-                myCards.Add(myCard);
+                Set set = new Set(winCard, myCard);
+                set.score = set.myCard.CardScore(GetWinningNumbersAmount(set.winCard, set.myCard));
+                sets.Add(set);
             }
+        }
+    }
+
+    public class Set
+    {
+        public Card winCard = new Card();
+        public Card myCard = new Card();
+        public int score = 0;
+
+        public Set(Card _winCard, Card _myCard)
+        {
+            winCard = _winCard;
+            myCard = _myCard;
         }
     }
 
     public class Card
     {
-        public Dictionary<int, bool> numbers = new Dictionary<int, bool>();
+        public List<int> numbers = new List<int>();
         public int numbersAmount = 0;
 
         public Card(params int[] _numbers)
         {
             foreach (int i in _numbers)
             {
-                numbers.Add(i, false);
+                numbers.Add(i);
             }
         }
 
         public void AddNumber(int number)
         {
-            numbers.Add(number, false);
+            numbers.Add(number);
         }
 
         public int CardScore(int matchingNumbersAmount)
