@@ -25,6 +25,9 @@ namespace AoC2023_Exo4
     */
     public class Program
     {
+        public static List<Card> winCards = new List<Card>();
+        public static List<Card> myCards = new List<Card>();
+
         public static void Main()
         {
             string text = Utils.ReadFile("E:\\Projets\\AdventOfCode\\AdventOfCode\\AoC\\Exo2023_04.txt");
@@ -33,12 +36,15 @@ namespace AoC2023_Exo4
             {
                 ":",
                 "|",
-                " "
             };
-            string[] textFormatted = FormatText(textSplitted, separators);
+            int total = 0;
+            SplitCards(textSplitted, separators);
 
-            List<Card> winCards = new List<Card>();
-            List<Card> myCards = new List<Card>();
+            for (int i = 0; i < myCards.Count(); i++)
+            {
+                total += myCards[i].CardScore(GetWinningNumbersAmount(winCards[i], myCards[i]));
+            }
+            Console.WriteLine($"Total: {total}");
         }
 
         public static int GetWinningNumbersAmount(Card winCard, Card comparedCard)
@@ -60,28 +66,33 @@ namespace AoC2023_Exo4
             return amount;
         }
 
-        public static string[] FormatText(string[] input, string[] separators)
+        public static void SplitCards(string[] input, string[] separators)
         {
-            string[] formattedInput = [];
-            foreach(string str in input)
+            foreach (string line in input)
             {
-                formattedInput = str.Split(separators, StringSplitOptions.RemoveEmptyEntries).ToArray();
+                string[] formattedInput = line.Split(separators, StringSplitOptions.RemoveEmptyEntries).ToArray();
+                Card winCard = new Card();
+                Card myCard = new Card();
+                foreach (string str in formattedInput[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray())
+                {
+                    winCard.AddNumber(int.Parse(str));
+                    Console.WriteLine($"WinCard: {str}");
+                }
+                winCards.Add(winCard);
+                foreach (string str in formattedInput[2].Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray())
+                {
+                    myCard.AddNumber(int.Parse(str));
+                    Console.WriteLine($"MyCard: {str}");
+                }
+                myCards.Add(myCard);
             }
-
-            return formattedInput;
         }
-    
     }
 
     public class Card
     {
         public Dictionary<int, bool> numbers = new Dictionary<int, bool>();
         public int numbersAmount = 0;
-
-        public Card(int amount) 
-        {
-            numbersAmount = amount;
-        }
 
         public Card(params int[] _numbers)
         {
@@ -114,9 +125,9 @@ namespace AoC2023_Exo4
         [TestMethod]
         public void Test()
         {
-            Card card1 = new Card(41, 48, 83, 86, 17);
-            Card card2 = new Card(83, 86, 6, 31, 17, 9, 48, 53);
-            Assert.AreEqual(8, card1.CardScore(Program.GetWinningNumbersAmount(card2, card1)));
+            Card winCard = new Card(41, 48, 83, 86, 17);
+            Card myCard = new Card(83, 86, 6, 31, 17, 9, 48, 53);
+            Assert.AreEqual(8, myCard.CardScore(Program.GetWinningNumbersAmount(winCard, myCard)));
         }
     }
 }
