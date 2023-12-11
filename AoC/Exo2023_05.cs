@@ -34,8 +34,13 @@ namespace AoC2023_Exo5
             string[] textSplitted = text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             // STEP 1
+            //CreateMaps(textSplitted);
+            //CreateSeeds(textSplitted[0]);
+            //Console.WriteLine($"Smallest: {GetSmallestLocation(almanach.seeds, almanach.maps)}");
+
+            // STEP 2
             CreateMaps(textSplitted);
-            CreateSeeds(textSplitted[0]);
+            CreateRangedSeeds(textSplitted[0]);
             Console.WriteLine($"Smallest: {GetSmallestLocation(almanach.seeds, almanach.maps)}");
         }
 
@@ -65,6 +70,21 @@ namespace AoC2023_Exo5
             }
         }
 
+        private static void CreateRangedSeeds(string input)
+        {
+            string[] splittedInput = input.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i <= splittedInput.Length - 1; i++)
+            {
+                string s = splittedInput[i];
+                if (char.IsDigit(s.First()))
+                {
+                    almanach.seeds.Add(new Seed(BigInteger.Parse(s), BigInteger.Parse(splittedInput[i+1])));
+                    i++;
+                }
+            }
+        }
+
         private static void CreateMaps(string[] input)
         {
             for (Int64 i = 1; i < input.Length; i++)
@@ -85,6 +105,7 @@ namespace AoC2023_Exo5
     public class Seed
     {
         public BigInteger id = 0;
+        public BigInteger seedRange = 0;
 
         public Seed (BigInteger _id)
         {
@@ -92,16 +113,32 @@ namespace AoC2023_Exo5
             Console.WriteLine($"New Seed: {id}");
         }
 
+        public Seed(BigInteger _id, BigInteger _seedRange)
+        {
+            id = _id;
+            seedRange = _seedRange;
+            Console.WriteLine($"New Seed: {id} -> {id + seedRange}");
+        }
+
         public BigInteger GetLocation(List<Map> maps)
         {
-            BigInteger loc = id;
+            BigInteger tmp = 0;
 
-            foreach(Map map in maps)
+            for (BigInteger i = 0; i < seedRange; i++)
             {
-                loc = map.Convert(loc);
-            }
+                BigInteger derp = id + i;
+                foreach (Map map in maps)
+                {
+                    derp = map.Convert(derp);
+                }
 
-            return loc;
+                if (derp < tmp || tmp == 0)
+                    tmp = derp;
+                //Console.WriteLine($"From: {id + i}, Converted: {derp}");
+            }
+            Console.WriteLine($"Smallest in seed range: {tmp}");
+
+            return tmp;
         }
     }
 
