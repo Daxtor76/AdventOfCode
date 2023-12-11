@@ -36,34 +36,16 @@ namespace AoC2023_Exo5
             // STEP 1
             CreateMaps(textSplitted);
             CreateSeeds(textSplitted[0]);
-
-            Console.WriteLine(GetSmallestLocation(almanach.seeds, almanach.maps));
-
-            //DEBUG SEEDS
-            /*foreach (Seed seed in almanach.seeds)
-            {
-                Console.WriteLine(seed.id);
-            }*/
-
-            /* DEBUG MAPS
-            foreach (Map map in almanach.maps)
-            {
-                Console.WriteLine($"New map:");
-                foreach (Int64 i in map.destSources.Keys.ToList())
-                {
-                    Console.WriteLine($"Dest: {i}, Source: {map.destSources[i]}");
-                }
-            }*/
+            Console.WriteLine($"Smallest: {GetSmallestLocation(almanach.seeds, almanach.maps)}");
         }
 
-        private static Int64 GetSmallestLocation(List<Seed> seeds, List<Map> maps)
+        private static BigInteger GetSmallestLocation(List<Seed> seeds, List<Map> maps)
         {
-            List<Int64> locations = new List<Int64>();
+            List<BigInteger> locations = new List<BigInteger>();
 
             foreach (Seed seed in seeds)
             {
                 locations.Add(seed.GetLocation(maps));
-                Console.WriteLine(seed.GetLocation(maps));
             }
             locations = locations.Order().ToList();
 
@@ -77,7 +59,9 @@ namespace AoC2023_Exo5
             foreach (string s in splittedInput)
             {
                 if (char.IsDigit(s.First()))
-                    almanach.seeds.Add(new Seed(Int64.Parse(s)));
+                {
+                    almanach.seeds.Add(new Seed(BigInteger.Parse(s)));
+                }
             }
         }
 
@@ -89,6 +73,8 @@ namespace AoC2023_Exo5
                 {
                     Map mapToAdd = new Map();
                     almanach.maps.Add(mapToAdd);
+
+                    Console.WriteLine($"New map!");
                 }
                 else
                     almanach.maps.Last().AddEntry(input[i]);
@@ -98,16 +84,17 @@ namespace AoC2023_Exo5
 
     public class Seed
     {
-        public Int64 id = 0;
+        public BigInteger id = 0;
 
-        public Seed (Int64 _id)
+        public Seed (BigInteger _id)
         {
-            this.id = _id;
+            id = _id;
+            Console.WriteLine($"New Seed: {id}");
         }
 
-        public Int64 GetLocation(List<Map> maps)
+        public BigInteger GetLocation(List<Map> maps)
         {
-            Int64 loc = id;
+            BigInteger loc = id;
 
             foreach(Map map in maps)
             {
@@ -118,27 +105,41 @@ namespace AoC2023_Exo5
         }
     }
 
+    public class Entry
+    {
+        public BigInteger source;
+        public BigInteger dest;
+        public BigInteger range;
+
+        public Entry(BigInteger _source, BigInteger _dest, BigInteger _range)
+        {
+            source = _source;
+            dest = _dest;
+            range = _range;
+        }
+    }
+
     public class Map
     {
-        public List<Vector3> sourceDest = new List<Vector3>();
+        public List<Entry> sourceDest = new List<Entry>();
         public void AddEntry(string _entry)
         {
-            Int64 range = Int64.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[2]);
-            Int64 source = Int64.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[1]);
-            Int64 dest = Int64.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[0]);
+            BigInteger range = BigInteger.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[2]);
+            BigInteger source = BigInteger.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[1]);
+            BigInteger dest = BigInteger.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[0]);
+            Entry entry = new Entry(source, dest, range);
 
-            Vector3 entry = new Vector3((Int64)source, (Int64)dest, (Int64)range);
+            Console.WriteLine($"New entry source: {entry.source} dest: {entry.dest} range: {entry.range}");
             sourceDest.Add(entry);
         }
 
-        public Int64 Convert(Int64 sourceInput)
+        public BigInteger Convert(BigInteger sourceInput)
         {
-            foreach (Vector3 entry in sourceDest)
+            foreach (Entry entry in sourceDest)
             {
-                Int64 calculatedRange = (Int64)entry.Y - (Int64)entry.X;
-                if (sourceInput >= entry.X && sourceInput <= entry.X + entry.Z)
+                if (sourceInput >= entry.source && sourceInput <= entry.source + entry.range)
                 {
-                    return (Int64)(sourceInput - entry.X + entry.Y);
+                    return sourceInput - entry.source + entry.dest;
                 }
             }
             return sourceInput;
