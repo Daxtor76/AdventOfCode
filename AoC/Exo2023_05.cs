@@ -41,12 +41,13 @@ namespace AoC2023_Exo5
             // STEP 2
             CreateMaps(textSplitted);
             CreateRangedSeeds(textSplitted[0]);
-            Console.WriteLine($"Smallest: {GetSmallestLocation(almanach.seeds, almanach.maps)}");
+            Console.WriteLine($"Smallest: {almanach.seeds[0].GetLocation(almanach.maps)}");
+            //Console.WriteLine($"Smallest: {GetSmallestLocation(almanach.seeds, almanach.maps)}");
         }
 
-        private static BigInteger GetSmallestLocation(List<Seed> seeds, List<Map> maps)
+        private static long GetSmallestLocation(List<Seed> seeds, List<Map> maps)
         {
-            List<BigInteger> locations = new List<BigInteger>();
+            List<long> locations = new List<long>();
 
             foreach (Seed seed in seeds)
             {
@@ -65,7 +66,7 @@ namespace AoC2023_Exo5
             {
                 if (char.IsDigit(s.First()))
                 {
-                    almanach.seeds.Add(new Seed(BigInteger.Parse(s)));
+                    almanach.seeds.Add(new Seed(long.Parse(s)));
                 }
             }
         }
@@ -79,7 +80,7 @@ namespace AoC2023_Exo5
                 string s = splittedInput[i];
                 if (char.IsDigit(s.First()))
                 {
-                    almanach.seeds.Add(new Seed(BigInteger.Parse(s), BigInteger.Parse(splittedInput[i+1])));
+                    almanach.seeds.Add(new Seed(long.Parse(s), long.Parse(splittedInput[i+1])));
                     i++;
                 }
             }
@@ -87,7 +88,7 @@ namespace AoC2023_Exo5
 
         private static void CreateMaps(string[] input)
         {
-            for (Int64 i = 1; i < input.Length; i++)
+            for (long i = 1; i < input.Length; i++)
             {
                 if (!char.IsDigit(input[i].First()))
                 {
@@ -104,29 +105,29 @@ namespace AoC2023_Exo5
 
     public class Seed
     {
-        public BigInteger id = 0;
-        public BigInteger seedRange = 0;
+        public long id = 0;
+        public long seedRange = 0;
 
-        public Seed (BigInteger _id)
+        public Seed (long _id)
         {
             id = _id;
             Console.WriteLine($"New Seed: {id}");
         }
 
-        public Seed(BigInteger _id, BigInteger _seedRange)
+        public Seed(long _id, long _seedRange)
         {
             id = _id;
             seedRange = _seedRange;
-            Console.WriteLine($"New Seed: {id} -> {id + seedRange}");
+            Console.WriteLine($"New Ranged Seed: {id} -> {id + seedRange}");
         }
 
-        public BigInteger GetLocation(List<Map> maps)
+        public long GetLocation(List<Map> maps)
         {
-            BigInteger tmp = 0;
+            long tmp = 0;
 
-            for (BigInteger i = 0; i < seedRange; i++)
+            for (long i = 0; i < seedRange; i++)
             {
-                BigInteger derp = id + i;
+                long derp = id + i;
                 foreach (Map map in maps)
                 {
                     derp = map.Convert(derp);
@@ -144,11 +145,11 @@ namespace AoC2023_Exo5
 
     public class Entry
     {
-        public BigInteger source;
-        public BigInteger dest;
-        public BigInteger range;
+        public long source;
+        public long dest;
+        public long range;
 
-        public Entry(BigInteger _source, BigInteger _dest, BigInteger _range)
+        public Entry(long _source, long _dest, long _range)
         {
             source = _source;
             dest = _dest;
@@ -161,24 +162,26 @@ namespace AoC2023_Exo5
         public List<Entry> sourceDest = new List<Entry>();
         public void AddEntry(string _entry)
         {
-            BigInteger range = BigInteger.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[2]);
-            BigInteger source = BigInteger.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[1]);
-            BigInteger dest = BigInteger.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[0]);
+            long range = long.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[2]);
+            long source = long.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[1]);
+            long dest = long.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[0]);
             Entry entry = new Entry(source, dest, range);
 
             Console.WriteLine($"New entry source: {entry.source} dest: {entry.dest} range: {entry.range}");
             sourceDest.Add(entry);
         }
 
-        public BigInteger Convert(BigInteger sourceInput)
+        public long Convert(long sourceInput)
         {
             foreach (Entry entry in sourceDest)
             {
                 if (sourceInput >= entry.source && sourceInput <= entry.source + entry.range)
                 {
+                    Console.WriteLine(sourceInput - entry.source + entry.dest);
                     return sourceInput - entry.source + entry.dest;
                 }
             }
+            Console.WriteLine(sourceInput);
             return sourceInput;
         }
     }
