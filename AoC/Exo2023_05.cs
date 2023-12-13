@@ -24,13 +24,15 @@ namespace AoC2023_Exo5
     /*
      * 323142463 too low
      * 323142464 too low
+     * 
+     * 595208875 too high
     */
     public class Program
     {
         public static Almanach almanach = new Almanach();
         public static void Main()
         {
-            string text = Utils.ReadFile("E:\\Projets\\AdventOfCode\\AdventOfCode\\AoC\\Exo2023_05.txt");
+            string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2023_05.txt");
             string[] textSplitted = text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             // STEP 1
@@ -95,7 +97,7 @@ namespace AoC2023_Exo5
                     Map mapToAdd = new Map();
                     almanach.maps.Add(mapToAdd);
 
-                    Console.WriteLine($"New map!");
+                    //Console.WriteLine($"New map!");
                 }
                 else
                     almanach.maps.Last().AddEntry(input[i]);
@@ -111,14 +113,14 @@ namespace AoC2023_Exo5
         public Seed (long _id)
         {
             id = _id;
-            Console.WriteLine($"New Seed: {id}");
+            //Console.WriteLine($"New Seed: {id}");
         }
 
         public Seed(long _id, long _seedRange)
         {
             id = _id;
             seedRange = _seedRange;
-            Console.WriteLine($"New Ranged Seed: {id} -> {id + seedRange}");
+            //Console.WriteLine($"New Ranged Seed: {id} -> {id + seedRange}");
         }
 
         public long GetLocation(List<Map> maps)
@@ -137,7 +139,7 @@ namespace AoC2023_Exo5
                     tmp = derp;
                 //Console.WriteLine($"From: {id + i}, Converted: {derp}");
             }
-            Console.WriteLine($"Smallest in seed range: {tmp}");
+            //Console.WriteLine($"Smallest in seed range: {tmp}");
 
             return tmp;
         }
@@ -167,7 +169,7 @@ namespace AoC2023_Exo5
             long dest = long.Parse(_entry.Split(" ", StringSplitOptions.RemoveEmptyEntries)[0]);
             Entry entry = new Entry(source, dest, range);
 
-            Console.WriteLine($"New entry source: {entry.source} dest: {entry.dest} range: {entry.range}");
+            //Console.WriteLine($"New entry source: {entry.source} dest: {entry.dest} range: {entry.range}");
             sourceDest.Add(entry);
         }
 
@@ -177,11 +179,11 @@ namespace AoC2023_Exo5
             {
                 if (sourceInput >= entry.source && sourceInput <= entry.source + entry.range)
                 {
-                    Console.WriteLine(sourceInput - entry.source + entry.dest);
+                    //Console.WriteLine(sourceInput - entry.source + entry.dest);
                     return sourceInput - entry.source + entry.dest;
                 }
             }
-            Console.WriteLine(sourceInput);
+            //.WriteLine(sourceInput);
             return sourceInput;
         }
     }

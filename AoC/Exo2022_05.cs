@@ -97,7 +97,7 @@ namespace AoC2022_Exo5
                     Instruction instr = new Instruction(line);
                     tmpList.Add(instr);
 
-                    Console.WriteLine($"move : {instr._amount} from : {instr._from} to {instr._to}");
+                    //Console.WriteLine($"move : {instr._amount} from : {instr._from} to {instr._to}");
                 }
             }
 
@@ -117,7 +117,7 @@ namespace AoC2022_Exo5
                 newString = newString.Replace("[", "");
                 newString = newString.Replace("]", "");
                 result.Add(newString);
-                Console.WriteLine(newString);
+                //Console.WriteLine(newString);
             }
 
             return result;
@@ -144,7 +144,7 @@ namespace AoC2022_Exo5
             for (int i = 0; i < _amount; i++)
             {
                 stacks[_to].Add(stacks[_from][^1]);
-                Console.WriteLine($"Moved {stacks[_from][^1]} from stack {_from} to {_to}");
+                //Console.WriteLine($"Moved {stacks[_from][^1]} from stack {_from} to {_to}");
                 stacks[_from].RemoveAt(stacks[_from].Count - 1);
             }
         }
@@ -154,7 +154,7 @@ namespace AoC2022_Exo5
             for (int i = _amount - 1; i > -1; i--)
             {
                 stacks[_to].Add(stacks[_from][stacks[_from].Count - 1 - i]);
-                Console.WriteLine($"Moved {stacks[_from][^1]} from stack {_from} to {_to}");
+                //Console.WriteLine($"Moved {stacks[_from][^1]} from stack {_from} to {_to}");
                 stacks[_from].RemoveAt(stacks[_from].Count - 1 - i);
             }
         }
