@@ -30,10 +30,11 @@ namespace AoC2023_Exo6
         public static Boat boat = new Boat();
         public static void Main()
         {
-            string text = Utils.ReadFile("E:\\Projets\\AdventOfCode\\AdventOfCode\\AoC\\Exo2023_06.txt");
+            string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2023_06.txt");
             string[] textSplitted = text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             string[] durations = textSplitted[0].Split(": ", StringSplitOptions.RemoveEmptyEntries);
             string[] records = textSplitted[1].Split(": ", StringSplitOptions.RemoveEmptyEntries);
+            Stopwatch jackeline = Stopwatch.StartNew();
 
             // STEP 1
             //races = GetRaces(durations, records);
@@ -42,6 +43,7 @@ namespace AoC2023_Exo6
             // STEP 2
             races = GetBigRace(durations, records);
             Console.WriteLine($"Winning strategies amount: {races[0].GetWinningStrategiesAmount(boat)}");
+            Console.WriteLine(jackeline.ElapsedMilliseconds);
         }
 
         public static long GetFinalValue(List<Race> races, Boat boat)
@@ -62,7 +64,7 @@ namespace AoC2023_Exo6
             List<Race> result = new List<Race>();
 
             Race race = new Race(long.Parse(duration), long.Parse(record));
-            Console.WriteLine($"New race! duration: {race.duration}, record: {race.record}");
+            //Console.WriteLine($"New race! duration: {race.duration}, record: {race.record}");
             result.Add(race);
 
             return result;
@@ -77,7 +79,7 @@ namespace AoC2023_Exo6
             for (long i = 0; i < durationsByRace.Length; i++)
             {
                 Race race = new Race(long.Parse(durationsByRace[i]), long.Parse(recordsByRace[i]));
-                Console.WriteLine($"New race! duration: {race.duration}, record: {race.record}");
+                //Console.WriteLine($"New race! duration: {race.duration}, record: {race.record}");
                 result.Add(race);
             }
 
@@ -96,7 +98,7 @@ namespace AoC2023_Exo6
         public long GiveSpeedToBoat(long inputDuration)
         {
             speed = inputDuration;
-            Console.WriteLine($"Boat speed changed to {speed}");
+            //Console.WriteLine($"Boat speed changed to {speed}");
             return speed;
         }
 
@@ -126,7 +128,7 @@ namespace AoC2023_Exo6
             {
                 long travelDist = boat.GetTravelDistance(this, i);
                 winStratValue += travelDist > record ? 1 : 0;
-                Console.WriteLine($"Travel dist: {travelDist}, record: {record} => {winStratValue} ways to win");
+                //Console.WriteLine($"Travel dist: {travelDist}, record: {record} => {winStratValue} ways to win");
             };
 
             return winStratValue;
