@@ -27,6 +27,7 @@ namespace AoC2023_Exo7
 {
     /*
      * 255260935 too high
+     * 255048101 ok !
     */
     public class Program
     {
@@ -65,21 +66,20 @@ namespace AoC2023_Exo7
 
             Stopwatch jackeline = Stopwatch.StartNew();
 
-            int test = 0;
+            int total = 0;
             hands = OrderHands(GetHands(textSplitted));
             foreach (Hand hand in hands)
             {
-                test += hand.GetHandScore();
-                Console.WriteLine($"hand: {hand.cards} - bid: {hand.bid} - type: {hand.type} - value: {GetHandTypeValue(hand)} - rank: {hand.rank} - score: {hand.GetHandScore()}");
+                total += hand.GetHandScore();
+                //Console.WriteLine($"hand: {hand.cards} - bid: {hand.bid} - type: {hand.type} - value: {GetHandTypeValue(hand)} - rank: {hand.rank} - score: {hand.GetHandScore()}");
             }
-            //Console.WriteLine($"{test}");
+            Console.WriteLine($"{total}");
 
             Console.WriteLine($"Time elapsed: {jackeline.ElapsedMilliseconds}");
         }
 
         public static List<Hand> OrderHands(List<Hand> hands)
         {
-            //List<Hand> tmp = hands.OrderBy(v => GetHandTypeValue(v)).ThenBy(b => GetCardsValue(b)).ToList();
             List<Hand> tmp = hands.OrderBy(x => GetHandTypeValue(x))
                                   .ThenBy(x => GetHandValue(x))
                                   .ToList();
@@ -102,26 +102,6 @@ namespace AoC2023_Exo7
 
             return int.Parse(tmp);
         }
-
-        /*public static int GetCardValue(char card)
-        {
-            return cardsValues.FindIndex(t => t == card);
-        }*/
-
-        /*public static int CompareHands(Hand hand1, Hand hand2)
-        {
-            for (int i = 0; i < hand1.cards.Count(); i++)
-            {
-                int cardValue1 = GetCardValue(hand1.cards[i]);
-                int cardValue2 = GetCardValue(hand2.cards[i]);
-
-                if (cardValue1 == cardValue2)
-                    continue;
-                else
-                    return cardValue1 > cardValue2 ? 1 : -1;
-            }
-            return 0;
-        }*/
 
         public static int GetHandTypeValue(Hand hand)
         {
