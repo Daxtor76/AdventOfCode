@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.WebSockets;
 using System.Numerics;
@@ -29,21 +30,21 @@ namespace AoC2023_Exo7
     */
     public class Program
     {
-        public static List<char> cardsValues = new List<char>
+        public static Dictionary<char, string> cardsValues = new Dictionary<char, string>
         {
-            '2',
-            '3',
-            '4',
-            '5',
-            '6',
-            '7',
-            '8',
-            '9',
-            'T',
-            'J',
-            'Q',
-            'K',
-            'A'
+            { '2', "00"},
+            { '3', "01"},
+            { '4', "02"},
+            { '5', "03"},
+            { '6', "04"},
+            { '7', "05"},
+            { '8', "06"},
+            { '9', "07"},
+            { 'T', "08"},
+            { 'J', "09"},
+            { 'Q', "10"},
+            { 'K', "11"},
+            { 'A', "12"}
         };
         public static List<string> handTypesValues = new List<string>
         {
@@ -69,18 +70,19 @@ namespace AoC2023_Exo7
             foreach (Hand hand in hands)
             {
                 test += hand.GetHandScore();
-                //Console.WriteLine($"hand: {hand.cards} - bid: {hand.bid} - type: {hand.type} - value: {GetHandTypeValue(hand)} - rank: {hand.rank} - score: {hand.GetHandScore()}");
-                Console.WriteLine($"cards value: {GetCardsValue(hand)}");
+                Console.WriteLine($"hand: {hand.cards} - bid: {hand.bid} - type: {hand.type} - value: {GetHandTypeValue(hand)} - rank: {hand.rank} - score: {hand.GetHandScore()}");
             }
-            Console.WriteLine($"{test}");
+            //Console.WriteLine($"{test}");
 
-            Console.WriteLine(jackeline.ElapsedMilliseconds);
+            Console.WriteLine($"Time elapsed: {jackeline.ElapsedMilliseconds}");
         }
 
         public static List<Hand> OrderHands(List<Hand> hands)
         {
             //List<Hand> tmp = hands.OrderBy(v => GetHandTypeValue(v)).ThenBy(b => GetCardsValue(b)).ToList();
-            List<Hand> tmp = hands.OrderBy(GetHandTypeValue).ToList().Sort();
+            List<Hand> tmp = hands.OrderBy(x => GetHandTypeValue(x))
+                                  .ThenBy(x => GetHandValue(x))
+                                  .ToList();
 
             foreach (Hand hand in tmp)
             {
@@ -90,17 +92,36 @@ namespace AoC2023_Exo7
             return tmp;
         }
 
-        public static int GetCardsValue(Hand hand)
+        public static int GetHandValue(Hand hand)
         {
             string tmp = "";
-
             foreach (char c in hand.cards)
             {
-                tmp += cardsValues.FindIndex(t => t == c);
+                tmp += cardsValues[c].ToString();
             }
 
             return int.Parse(tmp);
         }
+
+        /*public static int GetCardValue(char card)
+        {
+            return cardsValues.FindIndex(t => t == card);
+        }*/
+
+        /*public static int CompareHands(Hand hand1, Hand hand2)
+        {
+            for (int i = 0; i < hand1.cards.Count(); i++)
+            {
+                int cardValue1 = GetCardValue(hand1.cards[i]);
+                int cardValue2 = GetCardValue(hand2.cards[i]);
+
+                if (cardValue1 == cardValue2)
+                    continue;
+                else
+                    return cardValue1 > cardValue2 ? 1 : -1;
+            }
+            return 0;
+        }*/
 
         public static int GetHandTypeValue(Hand hand)
         {
@@ -123,7 +144,7 @@ namespace AoC2023_Exo7
         }
     }
 
-    public class Hand : IComparable
+    public class Hand
     {
         public string cards = "";
         public string type = "";
@@ -135,23 +156,6 @@ namespace AoC2023_Exo7
             cards = _cards;
             bid = _bid;
             type = GetHandType();
-        }
-
-        public int CompareTo(object obj)
-        {
-            string otherCards = obj as string;
-            if (otherCards != null)
-            {
-                for (int i = 0; i < cards.Length; i++)
-                {
-                    if (cards[i] == otherCards[i])
-                        continue;
-
-                    return Program.cardsValues.FindIndex(c => c == cards[i]).CompareTo(Program.cardsValues.FindIndex(t => t == otherCards[i]));
-                }
-            }
-            else
-                throw new ArgumentException("Other cards is empty");
         }
 
         public int GetHandScore()
@@ -179,15 +183,20 @@ namespace AoC2023_Exo7
                     return "FoOAK";
                 else if (cardCount.ContainsValue(3) && cardCount.ContainsValue(2))
                     return "FH";
-                else
-                    return "TOAK";
             }
             else if (cardCount.Count() == 3)
-                return "TP";
+            {
+                if (cardCount.ContainsValue(3) && cardCount.ContainsValue(1))
+                    return "TOAK";
+                else
+                    return "TP";
+            }
             else if (cardCount.Count() == 4)
                 return "OP";
             else
                 return "HC";
+
+            return "";
         }
     }
 
