@@ -31,21 +31,21 @@ namespace AoC2023_Exo7
     */
     public class Program
     {
-        public static Dictionary<char, string> cardsValues = new Dictionary<char, string>
+        public static List<char> cardsValues = new List<char>
         {
-            { '2', "00"},
-            { '3', "01"},
-            { '4', "02"},
-            { '5', "03"},
-            { '6', "04"},
-            { '7', "05"},
-            { '8', "06"},
-            { '9', "07"},
-            { 'T', "08"},
-            { 'J', "09"},
-            { 'Q', "10"},
-            { 'K', "11"},
-            { 'A', "12"}
+            '2',
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9',
+            'T',
+            'J',
+            'Q',
+            'K',
+            'A',
         };
         public static List<string> handTypesValues = new List<string>
         {
@@ -97,10 +97,15 @@ namespace AoC2023_Exo7
             string tmp = "";
             foreach (char c in hand.cards)
             {
-                tmp += cardsValues[c].ToString();
+                tmp += FormatCardValue(cardsValues.FindIndex(t => t == c));
             }
 
             return int.Parse(tmp);
+        }
+
+        public static string FormatCardValue(int value)
+        {
+            return value.ToString().Length < 2 ? $"{value:D2}" : value.ToString();
         }
 
         public static int GetHandTypeValue(Hand hand)
