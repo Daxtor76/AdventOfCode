@@ -15,6 +15,7 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Net.WebSockets;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
@@ -47,6 +48,22 @@ namespace AoC2023_Exo7
             'K',
             'A',
         };
+        public static List<char> cardsValuesStep2 = new List<char>
+        {
+            'J',
+            '2',
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9',
+            'T',
+            'Q',
+            'K',
+            'A',
+        };
         public static List<string> handTypesValues = new List<string>
         {
             "HC",
@@ -66,8 +83,9 @@ namespace AoC2023_Exo7
 
             Stopwatch jackeline = Stopwatch.StartNew();
 
+            // STEP 1
             int total = 0;
-            hands = OrderHands(GetHands(textSplitted));
+            hands = OrderHands(GetHands(textSplitted), cardsValues);
             foreach (Hand hand in hands)
             {
                 total += hand.GetHandScore();
@@ -75,13 +93,16 @@ namespace AoC2023_Exo7
             }
             Console.WriteLine($"{total}");
 
+            // STEP 2
+            // Nouvelle main = handtype + xJ
+
             Console.WriteLine($"Time elapsed: {jackeline.ElapsedMilliseconds}");
         }
 
-        public static List<Hand> OrderHands(List<Hand> hands)
+        public static List<Hand> OrderHands(List<Hand> hands, List<char> cardsValuesData)
         {
             List<Hand> tmp = hands.OrderBy(x => GetHandTypeValue(x))
-                                  .ThenBy(x => GetHandValue(x))
+                                  .ThenBy(x => GetHandValue(x, cardsValuesData))
                                   .ToList();
 
             foreach (Hand hand in tmp)
@@ -92,12 +113,21 @@ namespace AoC2023_Exo7
             return tmp;
         }
 
-        public static int GetHandValue(Hand hand)
+        public static Hand GetBestCombination(Hand hand)
+        {
+            List<Hand> combinations = new List<Hand>();
+
+            // string.replace()
+
+            return combinations.OrderBy(x => GetHandTypeValue(x)).ToList().Last();
+        }
+
+        public static int GetHandValue(Hand hand, List<char> data)
         {
             string tmp = "";
             foreach (char c in hand.cards)
             {
-                tmp += FormatCardValue(cardsValues.FindIndex(t => t == c));
+                tmp += FormatCardValue(data.FindIndex(t => t == c));
             }
 
             return int.Parse(tmp);
@@ -146,6 +176,27 @@ namespace AoC2023_Exo7
         public int GetHandScore()
         { 
             return bid * rank;
+        }
+
+        public int GetCardCount(char card)
+        {
+            int tmp = 0;
+            foreach (char c in cards)
+            {
+                if (c == card)
+                    tmp++;
+            }
+
+            return tmp;
+        }
+
+        public string GetNewHandType(string initialType)
+        {
+            string newType = "";
+
+            
+
+            return newType;
         }
 
         public string GetHandType()
