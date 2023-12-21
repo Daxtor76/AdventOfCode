@@ -89,7 +89,7 @@ namespace AoC2023_Exo7
             foreach (Hand hand in hands)
             {
                 total += hand.GetHandScore();
-                //Console.WriteLine($"hand: {hand.cards} - bid: {hand.bid} - type: {hand.type} - value: {GetHandTypeValue(hand)} - rank: {hand.rank} - score: {hand.GetHandScore()}");
+                Console.WriteLine($"hand: {hand.cards} - bid: {hand.bid} - type: {hand.type} - value: {GetHandTypeValue(hand)} - rank: {hand.rank} - score: {hand.GetHandScore()}");
             }
             Console.WriteLine($"{total}");
 
@@ -187,36 +187,33 @@ namespace AoC2023_Exo7
 
             foreach (char card in cards)
             {
-                if (!cardCount.ContainsKey(card))
+                if (card == 'J')
+                    continue;
+                else if (!cardCount.ContainsKey(card))
                     cardCount.Add(card, 1);
                 else
                     cardCount[card]++;
             }
 
-            if (cardCount.Count() == 1)
+            if (cardCount.ContainsValue(5))
                 return "FiOAK";
-            else if (cardCount.Count() == 2)
-            {
-                if (cardCount.ContainsValue(4) && cardCount.ContainsValue(1))
-                {
-                    return "FoOAK";
-                }
-                else if (cardCount.ContainsValue(3) && cardCount.ContainsValue(2))
-                    return "FH";
-            }
-            else if (cardCount.Count() == 3)
-            {
-                if (cardCount.ContainsValue(3) && cardCount.ContainsValue(1))
-                    return "TOAK";
-                else
-                    return "TP";
-            }
-            else if (cardCount.Count() == 4)
-                return "OP";
-            else
-                return "HC";
 
-            return "";
+            if (cardCount.ContainsValue(4))
+                return "FoOAK";
+
+            if (cardCount.ContainsValue(3) && cardCount.ContainsValue(2))
+                return "FH";
+
+            if (cardCount.ContainsValue(3) && !cardCount.ContainsValue(2))
+                return "TOAK";
+
+            if (cardCount.Where((x) => x.Value == 2).Count() == 2)
+                return "TP";
+
+            if (cardCount.Where((x) => x.Value == 2).Count() == 1)
+                return "OP";
+
+            return "HC";
         }
     }
 
