@@ -43,8 +43,8 @@ namespace AoC2023_Exo5
             // STEP 2
             CreateMaps(textSplitted);
             CreateRangedSeeds(textSplitted[0]);
-            Console.WriteLine($"Smallest: {almanach.seeds[0].GetLocation(almanach.maps)}");
-            //Console.WriteLine($"Smallest: {GetSmallestLocation(almanach.seeds, almanach.maps)}");
+            //Console.WriteLine($"Smallest: {almanach.seeds[0].GetLocation(almanach.maps)}");
+            Console.WriteLine($"Smallest: {GetSmallestLocation(almanach.seeds, almanach.maps)}");
         }
 
         private static long GetSmallestLocation(List<Seed> seeds, List<Map> maps)
@@ -103,6 +103,11 @@ namespace AoC2023_Exo5
                     almanach.maps.Last().AddEntry(input[i]);
             }
         }
+
+        private static void MixMaps(List<Map> maps)
+        {
+
+        }
     }
 
     public class Seed
@@ -127,7 +132,7 @@ namespace AoC2023_Exo5
         {
             long tmp = 0;
 
-            for (long i = 0; i < seedRange; i++)
+            for (long i = 0; i <= seedRange; i++)
             {
                 long derp = id + i;
                 foreach (Map map in maps)

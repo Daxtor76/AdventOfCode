@@ -78,7 +78,7 @@ namespace AoC2023_Exo7
         public static List<Hand> hands = new List<Hand>();
         public static void Main()
         {
-            string text = Utils.ReadFile("E:\\Projets\\AdventOfCode\\AdventOfCode\\AoC\\Exo2023_07.txt");
+            string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2023_07.txt");
             string[] textSplitted = text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             Stopwatch jackeline = Stopwatch.StartNew();
@@ -111,15 +111,6 @@ namespace AoC2023_Exo7
             }
 
             return tmp;
-        }
-
-        public static Hand GetBestCombination(Hand hand)
-        {
-            List<Hand> combinations = new List<Hand>();
-
-            // string.replace()
-
-            return combinations.OrderBy(x => GetHandTypeValue(x)).ToList().Last();
         }
 
         public static int GetHandValue(Hand hand, List<char> data)
@@ -190,15 +181,6 @@ namespace AoC2023_Exo7
             return tmp;
         }
 
-        public string GetNewHandType(string initialType)
-        {
-            string newType = "";
-
-            
-
-            return newType;
-        }
-
         public string GetHandType()
         {
             Dictionary<char, int> cardCount = new Dictionary<char, int>();
@@ -216,7 +198,9 @@ namespace AoC2023_Exo7
             else if (cardCount.Count() == 2)
             {
                 if (cardCount.ContainsValue(4) && cardCount.ContainsValue(1))
+                {
                     return "FoOAK";
+                }
                 else if (cardCount.ContainsValue(3) && cardCount.ContainsValue(2))
                     return "FH";
             }
