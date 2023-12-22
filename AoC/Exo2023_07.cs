@@ -21,6 +21,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -29,6 +30,9 @@ namespace AoC2023_Exo7
     /*
      * 255260935 too high
      * 255048101 ok !
+     * 
+     * 253680676 too low
+     * 253718286 ok !
     */
     public class Program
     {
@@ -78,23 +82,20 @@ namespace AoC2023_Exo7
         public static List<Hand> hands = new List<Hand>();
         public static void Main()
         {
-            string text = Utils.ReadFile("C:\\Prototypes_Perso\\AdventOfCode\\AoC\\Exo2023_07.txt");
+            string text = Utils.ReadFile("E:\\Projets\\AdventOfCode\\AdventOfCode\\AoC\\Exo2023_07.txt");
             string[] textSplitted = text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             Stopwatch jackeline = Stopwatch.StartNew();
 
             // STEP 1
             int total = 0;
-            hands = OrderHands(GetHands(textSplitted), cardsValues);
+            hands = OrderHands(GetHands(textSplitted), cardsValuesStep2);
             foreach (Hand hand in hands)
             {
                 total += hand.GetHandScore();
                 Console.WriteLine($"hand: {hand.cards} - bid: {hand.bid} - type: {hand.type} - value: {GetHandTypeValue(hand)} - rank: {hand.rank} - score: {hand.GetHandScore()}");
             }
             Console.WriteLine($"{total}");
-
-            // STEP 2
-            // Nouvelle main = handtype + xJ
 
             Console.WriteLine($"Time elapsed: {jackeline.ElapsedMilliseconds}");
         }
@@ -143,6 +144,7 @@ namespace AoC2023_Exo7
                 string[] splittedInput = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
                 Hand hand = new Hand(splittedInput[0], int.Parse(splittedInput[1]));
+                hand.type = hand.GetConvertedHandType(hand.GetHandType(false), hand.GetCardCount('J'));
                 hands.Add(hand);
             }
 
@@ -161,7 +163,6 @@ namespace AoC2023_Exo7
         {
             cards = _cards;
             bid = _bid;
-            type = GetHandType();
         }
 
         public int GetHandScore()
@@ -181,19 +182,52 @@ namespace AoC2023_Exo7
             return tmp;
         }
 
-        public string GetHandType()
+        private Dictionary<char, int> CountCards(bool withJokers)
         {
             Dictionary<char, int> cardCount = new Dictionary<char, int>();
-
             foreach (char card in cards)
             {
-                if (card == 'J')
+                if (!withJokers && card == 'J')
                     continue;
                 else if (!cardCount.ContainsKey(card))
                     cardCount.Add(card, 1);
                 else
                     cardCount[card]++;
             }
+            return cardCount;
+        }
+
+        public string GetConvertedHandType(string type, int jokersAmount)
+        {
+            string newType = type;
+
+            for (int i = 0; i < jokersAmount; i++)
+            {
+                if (newType == "HC")
+                    newType = "OP";
+                else if (newType == "OP")
+                {
+                    // TOAK ou TP ? forcément TOAK car plus fort que TP
+                    newType = "TOAK";
+                }
+                else if (newType == "TP")
+                    newType = "FH";
+                else if (newType == "FH")
+                    continue;
+                else if (newType == "TOAK")
+                    newType = "FoOAK";
+                else if (newType == "FoOAK")
+                    newType = "FiOAK";
+                else if (newType == "FiOAK")
+                    continue;
+            }
+
+            return newType;
+        }
+
+        public string GetHandType(bool withJokers)
+        {
+            Dictionary<char, int> cardCount = CountCards(withJokers);
 
             if (cardCount.ContainsValue(5))
                 return "FiOAK";
